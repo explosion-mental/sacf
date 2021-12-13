@@ -67,34 +67,29 @@ daemonize(void)
 
 }
 
-void
-charge()
+char
+ischarging()
 {
 	FILE *fp;
-	char online[2];
-	char *power;
+	char online;
 
-	power = "/sys/class/power_supply/";
-	//A*/online
-	//cat
-
+	//there has to be a better way?
 	fp = popen("/bin/grep . /sys/class/power_supply/A*/online", "r");
-
 	if (fp == NULL) {
-		printf("Failed to run grep.\n" );
+		fprintf(stderr, "Failed to run grep.\n");
 		exit(1);
 	}
 
-	/* Read the output a line at a time - output it. */
-	while (fgets(online, sizeof(online), fp) != NULL) {
-		printf("%s", online);
-	}
+	//while (fgets(online, sizeof(online), fp) != NULL) {
+	//online = fgetc(fp);
 
-	/* close */
+	online = getc(fp);
 	pclose(fp);
+
+	return online;
 }
 
-int
+unsigned int
 nproc(void)
 {
 	unsigned int cores, threads;
@@ -126,10 +121,10 @@ main(int argc, char *argv[])
 			puts("sacf-"VERSION);
 			exit(0);
 		} else if (!strcmp(argv[i], "-t")) { /* number of cores */
-			printf("Cores: %i\n", nproc());
+			printf("Cores: %u\n", nproc());
 			exit(0);
 		} else if (!strcmp(argv[i], "-c")) {
-			charge();
+			printf("AC adapter status: %c\n", ischarging());
 			exit(0);
 		}
 		//else if (i + 1 == argc)
