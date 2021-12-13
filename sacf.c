@@ -130,6 +130,7 @@ turbo(int on)
 
 	/* change state of the turbo */
 	fprintf(fp, "%d\n", on);
+	turbostate = on;
 
 	fclose(fp);
 
