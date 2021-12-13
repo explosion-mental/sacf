@@ -24,10 +24,7 @@ static const char *governors[] = {
     "userspace",
     "powersave",
 };
-
-//static const long cpus = sysconf(_SC_NPROCESSORS_ONLN);
-//static const int powersave_load_threshold = (75 * cpus) / 100;
-//static const int performance_load_threshold = (50 * cpus) / 100;
+static int turbostate;
 
 void
 usage(void)
@@ -72,6 +69,7 @@ ischarging()
 {
 	FILE *fp;
 	char online;
+	//TODO handle multiple AC online ?
 
 	//there has to be a better way?
 	fp = popen("/bin/grep . /sys/class/power_supply/A*/online", "r");
@@ -105,6 +103,46 @@ nproc(void)
 
 }
 
+//this should return an exit status.
+static void
+turbo(int on)
+{
+	FILE *fp = NULL;
+	const char *intel = "/sys/devices/system/cpu/intel_pstate/no_turbo";
+	const char *boost = "/sys/devices/system/cpu/cpufreq/boost";
+
+	/* figure what path to use */
+	if (access(intel, F_OK) != -1) {
+		//fp = intel;
+		fp = fopen(intel, "w");
+	} else if (access(boost, F_OK) != -1) {
+		//fp = boost;
+		fp = fopen(boost, "w");
+	} else {
+		fprintf(stderr, "CPU turbo is not available.\n");
+		return;
+	}
+
+	if (fp == NULL) {
+	    fprintf(stderr, "Error opening file. Are you root?\n");
+	    exit(1);
+	}
+
+	/* change state of the turbo */
+	fprintf(fp, "%d\n", on);
+
+	fclose(fp);
+
+	return;
+}
+
+
+//powersave(void)
+//{
+//	p1 = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference"
+//	p2 = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost"
+//}
+
 int
 main(int argc, char *argv[])
 {
@@ -120,8 +158,14 @@ main(int argc, char *argv[])
 		if (!strcmp(argv[i], "-v")) {      /* prints version information */
 			puts("sacf-"VERSION);
 			exit(0);
-		} else if (!strcmp(argv[i], "-t")) { /* number of cores */
+		} else if (!strcmp(argv[i], "-l")) { /* number of cores */
 			printf("Cores: %u\n", nproc());
+			exit(0);
+		} else if (!strcmp(argv[i], "-t")) { /* turbo on */
+			turbo(1);
+			exit(0);
+		} else if (!strcmp(argv[i], "-T")) { /* turbo off */
+			turbo(0);
 			exit(0);
 		} else if (!strcmp(argv[i], "-c")) {
 			printf("AC adapter status: %c\n", ischarging());
