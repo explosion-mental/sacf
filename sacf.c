@@ -106,6 +106,36 @@ nproc(void)
 
 }
 
+//#include <time.h>
+static int
+cpuload(void)
+{
+	//TODO get the cpu load over 1 second interval
+	float up1, up2, idle1, idle2;
+	FILE *fp = NULL;
+	//clock
+
+	/* first reading */
+	fp = fopen("/proc/uptime", "r");
+	fscanf(fp, "%f %f", &up1, &idle1);
+	printf("uptime1: %f\nidle1: %f\n", up1, idle1);
+	fclose(fp);
+
+	sleep(1);
+
+	/* second reading */
+	fp = fopen("/proc/uptime", "r");
+	fscanf(fp, "%f %f", &up2, &idle2);
+	printf("uptime2: %f\nidle2: %f\n", up2, idle2);
+	fclose(fp);
+
+
+
+	//% CPU usage = (CPU time) / (# of cores) / (wall time)
+	//CPU usage =  100 - 100 * (idle2 - idle1) / (uptime2 - uptime1)
+	return 0;
+}
+
 //this should return an exit status.
 static void
 turbo(int on)
@@ -166,13 +196,6 @@ setgovernor(char *governor)
 
 }
 
-static int
-cpuload(void)
-{
-	//TODO get the cpu load over 1 second interval
-
-}
-
 static void
 powersave()
 {
@@ -190,8 +213,8 @@ powersave()
 int
 main(int argc, char *argv[])
 {
-	FILE *fp = NULL;
 	int i;
+	//FILE *fp = NULL;
 	//chdir("/tmp");
 
 	// log file in write mode
