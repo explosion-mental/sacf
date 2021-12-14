@@ -15,6 +15,8 @@
 /* macros */
 #define LENGTH(a)               (sizeof(a) / sizeof(a)[0])
 #define ABS(a)			((a) > 0 ? (a) : -(a))
+//TODO function that reads this enums and returns the desired value (fscanf /proc)
+enum { POWERSAVE, TURBO, CPUS };
 
 static const char *governors[] = {
     "performance",
@@ -137,12 +139,37 @@ turbo(int on)
 	return;
 }
 
+static void
+setgovernor(char *governor)
+{
+	//p1 = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference"
+	//p2 = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost"
+	//char i;
+	//"/cpufreq/scaling_governor"
 
-//powersave(void)
-//{
-//	p1 = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference"
-//	p2 = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost"
-//}
+	FILE *fp = NULL;
+	char path[] = "/sys/devices/system/cpu/cpu";
+	char end[] = "/cpufreq/scaling_governor";
+	char tmp[LENGTH(path) + sizeof(char) + LENGTH(end)];
+	int i;
+
+	for (i = 0; i < nproc(); i++) {
+		/* store the path of cpu i on tmp */
+		snprintf(tmp, LENGTH(tmp), "%s%d", path, i);
+		strncat(tmp, end, LENGTH(end));
+		printf("%s\n", tmp);
+
+		/* set the governor of cpu i */
+		fp = fopen(tmp, "w");
+		if (fp == NULL) {
+			fprintf(stderr, "Error opening file. Are you root?\n");
+			exit(1);
+		} else
+		fprintf(fp, "%s\n", governor);
+		fclose(fp);
+	}
+
+}
 
 int
 main(int argc, char *argv[])
@@ -168,8 +195,11 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-T")) { /* turbo off */
 			turbo(0);
 			exit(0);
-		} else if (!strcmp(argv[i], "-c")) {
+		} else if (!strcmp(argv[i], "-c")) { /* AC adapter status */
 			printf("AC adapter status: %c\n", ischarging());
+			exit(0);
+		} else if (!strcmp(argv[i], "-p")) { /* set gorvenor to powersave */
+			setgovernor("powersave");
 			exit(0);
 		}
 		//else if (i + 1 == argc)
