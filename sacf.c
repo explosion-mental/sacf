@@ -95,13 +95,14 @@ nproc(void)
 	unsigned int cores, threads;
 	FILE *fp = fopen("/proc/cpuinfo", "r");
 
-//	while (!fscanf(fp, "siblings\t: %u", &threads))
-//		fscanf(fp, "%*[^s]");
-	while (!fscanf(fp, "cpu cores\t: %u", &cores))
-		fscanf(fp, "%*[^c]");
+	while (!fscanf(fp, "siblings\t: %u", &threads))
+		fscanf(fp, "%*[^s]");
+	//while (!fscanf(fp, "cpu cores\t: %u", &cores))
+	//	fscanf(fp, "%*[^c]");
 	fclose(fp);
 
-	return cores;
+	//return cores;
+	return threads;
 
 }
 
@@ -110,8 +111,8 @@ static void
 turbo(int on)
 {
 	FILE *fp = NULL;
-	const char *intel = "/sys/devices/system/cpu/intel_pstate/no_turbo";
-	const char *boost = "/sys/devices/system/cpu/cpufreq/boost";
+	const char intel[] = "/sys/devices/system/cpu/intel_pstate/no_turbo";
+	const char boost[] = "/sys/devices/system/cpu/cpufreq/boost";
 
 	/* figure what path to use */
 	if (access(intel, F_OK) != -1) {
@@ -135,21 +136,14 @@ turbo(int on)
 	turbostate = on;
 
 	fclose(fp);
-
-	return;
 }
 
 static void
 setgovernor(char *governor)
 {
-	//p1 = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference"
-	//p2 = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost"
-	//char i;
-	//"/cpufreq/scaling_governor"
-
 	FILE *fp = NULL;
-	char path[] = "/sys/devices/system/cpu/cpu";
-	char end[] = "/cpufreq/scaling_governor";
+	const char path[] = "/sys/devices/system/cpu/cpu";
+	const char end[] = "/cpufreq/scaling_governor";
 	char tmp[LENGTH(path) + sizeof(char) + LENGTH(end)];
 	int i;
 
@@ -166,8 +160,30 @@ setgovernor(char *governor)
 			exit(1);
 		} else
 		fprintf(fp, "%s\n", governor);
+		//perror(""); //use perror and output whether they are missing privileges
 		fclose(fp);
 	}
+
+}
+
+static int
+cpuload(void)
+{
+	//TODO get the cpu load over 1 second interval
+
+}
+
+static void
+powersave()
+{
+	const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
+	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
+
+	if (access(pp, F_OK) != -1 && access(intel, F_OK) == -1) {
+		printf("Using 'balance_power' governor.");
+		setgovernor("balance_power");
+	}
+	//TODO depending on the cpuload() set different settings
 
 }
 
