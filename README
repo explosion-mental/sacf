@@ -1,2 +1,18 @@
 scaf - simple auto cpu frequencer
 =================================
+Work In Porgress (ONLY FOR TESTING)
+
+sacf it's a daemon that monitors the cpu N number of seconds and simply tweak
+governors and decided whether to use turbo boost or not.
+
+Usage
+-----
+
+	sacf [-cvltT]
+
+
+TODO
+====
+- get cpuload percentage (see: lsstatus)
+- variable (config.h) about how many seconds too 'sleep' before doing the 'frequencer' part
+- variable (config.h) whether to have turbo boost always on.
