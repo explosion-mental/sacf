@@ -25,5 +25,4 @@ Afterwards enter the following command to build and install sacf
 TODO
 ====
 - freebsd and openbsd support
-- man page
 - save the turbo state into a variable instead of opening /sys every time
