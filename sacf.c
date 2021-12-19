@@ -308,7 +308,7 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-l")) { /* info that sacf uses */
 			fprintf(stdout, "Cores: %u\n", nproc());
 			fprintf(stdout, "AC adapter status: %c\n", ischarging());
-			fprintf(stdout, "Average system load: %f\n", avgload());
+			fprintf(stdout, "Average system load: %0.2f\n", avgload());
 			fprintf(stdout, "System temperature: %d °C\n", temperature());
 			exit(0);
 		} else if (!strcmp(argv[i], "-t")) { /* turbo on */
