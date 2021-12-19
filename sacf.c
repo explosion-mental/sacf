@@ -43,6 +43,8 @@ static const char *governors[] = {
 };
 static int turbostate;
 
+#include "config.h"
+
 static void
 usage(void)
 {
@@ -156,8 +158,8 @@ daemonize(void)
 static char
 ischarging()
 {
-	FILE *fp;
 	char online;
+	FILE *fp;
 	//TODO handle multiple AC online ?
 
 	//there has to be a better way?
@@ -315,7 +317,7 @@ powersave()
 	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
 	int cpuload, temp;
 	float sysload;
-	load_threshold = (75 * nproc()) / 100;
+	int load_threshold = (75 * nproc()) / 100;
 
 
 	if (access(pp, F_OK) != -1 && access(intel, F_OK) == -1) {
@@ -327,8 +329,8 @@ powersave()
 	sysload = avgload();
 	temp = temperature();
 
-	//TODO depending on the cpuload and sysload set different settings
-	if (cpuload >= 20)
+	//TODO depending on the sysload and temp set different settings
+	if (cpuload >= minperc)
 		turbo(1);
 	else
 		turbo(0);
