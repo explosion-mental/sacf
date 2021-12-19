@@ -340,7 +340,8 @@ main(int argc, char *argv[])
 	daemonize();
 
 	while (1) {
-		sleep(interval);
+		/* use 1 seconds if the interval is set to 0 */
+		sleep(interval <= 0 ? 1 : interval);
 		run();
 	}
 
