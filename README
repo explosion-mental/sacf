@@ -7,12 +7,14 @@ governors and decided whether to use turbo boost or not.
 
 Usage
 -----
+With no arguments it runs as daemon (currently the daemon does nothing)
 
 	sacf [-cvltT]
 
 
 TODO
 ====
-- get cpuload percentage (see: lsstatus)
+- freebsd and openbsd support
+- man page
 - variable (config.h) about how many seconds too 'sleep' before doing the 'frequencer' part
 - variable (config.h) whether to have turbo boost always on.
