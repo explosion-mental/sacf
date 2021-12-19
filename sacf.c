@@ -281,7 +281,7 @@ run(void)
 	sysload = avgload();
 	temp = temperature();
 
-	if (cpuload >= minperc
+	if (cpuload >= mincpu
 	|| temp >= mintemp
 	|| sysload >= load_threshold)
 		turbo(1);
