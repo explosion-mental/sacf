@@ -340,7 +340,7 @@ main(int argc, char *argv[])
 	daemonize();
 
 	while (1) {
-		sleep(1);
+		sleep(interval);
 		run();
 	}
 
