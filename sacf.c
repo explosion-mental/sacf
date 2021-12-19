@@ -29,9 +29,6 @@
 /* macros */
 #define LENGTH(a)               (sizeof(a) / sizeof(a)[0])
 
-/* variables */
-//static const char *governors[] = { "performance", "ondemand", "conservative", "schedutil", "userspace", "powersave" };
-
 #include "config.h"
 
 //TODO merge this func
@@ -110,29 +107,24 @@ cpuperc(void)
 static void
 daemonize(void)
 {
-	pid_t id = 0;
-
-	// child process
-	id = fork();
+	/* child process */
+	pid_t id = fork();
 
 	if (id < 0)
 		die("fork failed.");
 
-	// parent process
-	if (id > 0) {
-		//printf("child process %d\n", id);
-		//kill the parent
-		exit(0);
-	}
+	/* parent process */
+	if (id > 0)
+		exit(0); //kill the parent
 
-	// unmask the file mode
+	/* unmask the file mode */
 	umask(0);
 
-	//set new session
+	/* new session */
 	if (setsid() < 0)
 		exit(1);
 
-	// close stdin, stdout and stderr
+	/* close stdin, stdout and stderr */
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
@@ -179,57 +171,6 @@ nproc(void)
 }
 
 static void
-turbo(int on)
-{
-	FILE *fp = NULL;
-	const char intel[] = "/sys/devices/system/cpu/intel_pstate/no_turbo";
-	const char boost[] = "/sys/devices/system/cpu/cpufreq/boost";
-
-	/* figure what path to use */
-	if (access(intel, F_OK) != -1)
-		fp = fopen(intel, "w");
-	else if (access(boost, F_OK) != -1)
-		fp = fopen(boost, "w");
-	else {
-		fprintf(stderr, "CPU turbo is not available.\n");
-		return;
-	}
-
-	if (fp == NULL)
-		die("Error opening file.");
-
-	/* change state of turbo boost */
-	fprintf(fp, "%d\n", on);
-
-	fclose(fp);
-}
-
-static int
-temperature(void)
-{
-#ifdef __linux__
-	//uintmax_t temp;
-	unsigned int temp;
-	char file[] = "/sys/class/thermal/thermal_zone0/temp";
-
-	if (pscanf(file, "%u", &temp) != 1) {
-		return -1;
-	}
-
-	/* value in celsius */
-	return temp / 1000;
-#endif /* __linux__ */
-
-	#ifdef __OpenBSD__
-	//TODO openbsd support
-	#endif /* __OpenBSD__ */
-
-	#ifdef __FreeBSD__
-	//TODO freebsd support
-	#endif
-}
-
-static void
 setgovernor(char *governor)
 {
 	FILE *fp = NULL;
@@ -253,6 +194,57 @@ setgovernor(char *governor)
 		fclose(fp);
 	}
 
+}
+
+static int
+temperature(void)
+{
+	#ifdef __linux__
+	//uintmax_t temp;
+	unsigned int temp;
+	char file[] = "/sys/class/thermal/thermal_zone0/temp";
+
+	if (pscanf(file, "%u", &temp) != 1) {
+		return -1;
+	}
+
+	/* value in celsius */
+	return temp / 1000;
+	#endif /* __linux__ */
+
+	#ifdef __OpenBSD__
+	//TODO openbsd support
+	#endif /* __OpenBSD__ */
+
+	#ifdef __FreeBSD__
+	//TODO freebsd support
+	#endif
+}
+
+static void
+turbo(int on)
+{
+	FILE *fp = NULL;
+	const char intel[] = "/sys/devices/system/cpu/intel_pstate/no_turbo";
+	const char boost[] = "/sys/devices/system/cpu/cpufreq/boost";
+
+	/* figure what path to use */
+	if (access(intel, F_OK) != -1)
+		fp = fopen(intel, "w");
+	else if (access(boost, F_OK) != -1)
+		fp = fopen(boost, "w");
+	else {
+		fprintf(stderr, "CPU turbo is not available.\n");
+		return;
+	}
+
+	if (fp == NULL)
+		die("Error opening file.");
+
+	/* change state of turbo boost */
+	fprintf(fp, "%d\n", on);
+
+	fclose(fp);
 }
 
 static void
