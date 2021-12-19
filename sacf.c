@@ -202,7 +202,7 @@ turbo(int on)
 		fp = fopen(intel, "w");
 	else if (access(boost, F_OK) != -1)
 		fp = fopen(boost, "w");
-	} else {
+	else {
 		fprintf(stderr, "CPU turbo is not available.\n");
 		return;
 	}
@@ -277,22 +277,21 @@ run(void)
 {
 	int cpuload, temp;
 	float sysload;
-	int powersave_load_threshold = (75 * nproc()) / 100;
-	int performance_load_threshold = (50 * nproc()) / 100;
-	int charge = ischarging();
+	int load_threshold = (75 * nproc()) / 100;
+	int bat = ischarging();
 
 	if (access(pp, F_OK) != -1 && access(intel, F_OK) == -1) {
-		if (charge)
-			setgovernor("balance_performance");
-		else
+		if (bat)
 			setgovernor("balance_power");
+		else
+			setgovernor("balance_performance");
 	}
 	//else
 
-	if (charge)
-		setgovernor("performance");
-	else
+	if (bat)
 		setgovernor("powersave");
+	else
+		setgovernor("performance");
 
 
 	cpuload = cpuperc();
@@ -301,7 +300,7 @@ run(void)
 
 	if (cpuload >= minperc
 	|| temp >= mintemp
-	|| sysload >= powersave_load_threshold)
+	|| sysload >= load_threshold)
 		turbo(1);
 	else
 		turbo(0);
@@ -311,11 +310,6 @@ int
 main(int argc, char *argv[])
 {
 	int i;
-	//FILE *fp = NULL;
-	//chdir("/tmp");
-
-	// log file in write mode
-	//fp = fopen ("Log.txt", "w+");
 
 	for (i = 1; i < argc; i++)
 		/* these options take no arguments */
@@ -344,18 +338,11 @@ main(int argc, char *argv[])
 			usage();
 
 	daemonize();
+
 	while (1) {
-		//Dont block context switches, let the process sleep for some time
 		sleep(1);
-
-		//logging
-		//fprintf(fp, "Logging info...\n");
-		//fflush(fp);
-
-		// work here!
+		run();
 	}
-
-	//fclose(fp);
 
 	return 0;
 }
