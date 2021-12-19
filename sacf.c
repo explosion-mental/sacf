@@ -25,17 +25,12 @@
 #include <devstat.h>
 #endif
 
-
 #include "util.h"
 /* macros */
 #define LENGTH(a)               (sizeof(a) / sizeof(a)[0])
-#define ABS(a)			((a) > 0 ? (a) : -(a))
 
 /* variables */
-static const char *governors[] = { "performance", "ondemand", "conservative",
-					"schedutil", "userspace", "powersave" };
-static const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
-static const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
+//static const char *governors[] = { "performance", "ondemand", "conservative", "schedutil", "userspace", "powersave" };
 
 #include "config.h"
 
@@ -127,7 +122,7 @@ daemonize(void)
 	id = fork();
 
 	if (id < 0)
-		die("fork failed.\n");
+		die("fork failed.");
 
 	// parent process
 	if (id > 0) {
@@ -154,19 +149,17 @@ static char
 ischarging()
 {
 	char online;
-	FILE *fp;
 	//TODO handle multiple AC online ?
 
 	//there has to be a better way?
-	fp = popen("/bin/grep . /sys/class/power_supply/A*/online", "r");
-	if (fp == NULL) {
-		fprintf(stderr, "Failed to run grep.\n");
-		exit(1);
-	}
+	FILE *fp = popen("/bin/grep . /sys/class/power_supply/A*/online", "r");
+	if (fp == NULL)
+		die("Failed to run grep.");
 
 	//while (fgets(online, sizeof(online), fp) != NULL) {
 	//online = fgetc(fp);
 
+	/* it's only one character (0 or 1) */
 	online = getc(fp);
 	pclose(fp);
 
@@ -207,10 +200,8 @@ turbo(int on)
 		return;
 	}
 
-	if (fp == NULL) {
-	    fprintf(stderr, "Error opening file. Are you root?\n");
-	    exit(1);
-	}
+	if (fp == NULL)
+		die("Error opening file.");
 
 	/* change state of turbo boost */
 	fprintf(fp, "%d\n", on);
@@ -256,16 +247,13 @@ setgovernor(char *governor)
 		/* store the path of cpu i on tmp */
 		snprintf(tmp, LENGTH(tmp), "%s%d", path, i);
 		strncat(tmp, end, LENGTH(end));
-		printf("%s\n", tmp);
 
 		/* set the governor of cpu i */
 		if ((fp = fopen(tmp, "w")) != NULL)
 			fprintf(fp, "%s\n", governor);
-		else {
-			fprintf(stderr, "Error opening file. Are you root?\n");
-			exit(1); // if no file is open, then no file needs to be closed
+		else
+			die("Error opening file");
 			//perror(""); //use perror and output whether they are missing privileges
-		}
 
 		fclose(fp);
 	}
@@ -275,8 +263,12 @@ setgovernor(char *governor)
 static void
 run(void)
 {
+
 	int cpuload, temp;
 	float sysload;
+	const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
+	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
+
 	int load_threshold = (75 * nproc()) / 100;
 	int bat = ischarging();
 
@@ -286,7 +278,6 @@ run(void)
 		else
 			setgovernor("balance_performance");
 	}
-	//else
 
 	if (bat)
 		setgovernor("powersave");
