@@ -255,6 +255,31 @@ turbo(int on)
 	fclose(fp);
 }
 
+static int
+temperature(void)
+{
+#ifdef __linux__
+	//uintmax_t temp;
+	unsigned int temp;
+	char file[] = "/sys/class/thermal/thermal_zone0/temp";
+
+	if (pscanf(file, "%u", &temp) != 1) {
+		return -1;
+	}
+
+	/* value in celsius */
+	return temp / 1000;
+#endif /* __linux__ */
+
+	#ifdef __OpenBSD__
+	//TODO openbsd support
+	#endif /* __OpenBSD__ */
+
+	#ifdef __FreeBSD__
+	//TODO freebsd support
+	#endif
+}
+
 static void
 setgovernor(char *governor)
 {
@@ -288,8 +313,10 @@ powersave()
 {
 	const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
 	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
-	int cpuload;
+	int cpuload, temp;
 	float sysload;
+	load_threshold = (75 * nproc()) / 100;
+
 
 	if (access(pp, F_OK) != -1 && access(intel, F_OK) == -1) {
 		printf("Using 'balance_power' governor.");
@@ -298,9 +325,13 @@ powersave()
 
 	cpuload = cpuperc();
 	sysload = avgload();
+	temp = temperature();
 
 	//TODO depending on the cpuload and sysload set different settings
-
+	if (cpuload >= 20)
+		turbo(1);
+	else
+		turbo(0);
 }
 
 int
