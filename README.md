@@ -6,7 +6,7 @@ use turbo boost or not.
 
 Usage
 -----
-With no arguments it runs as daemon.
+With no arguments it runs as a daemon. It needs root access.
 
     sacf [-ltTv] [-g governor]
 
