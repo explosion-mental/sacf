@@ -329,8 +329,11 @@ powersave()
 	sysload = avgload();
 	temp = temperature();
 
-	//TODO depending on the sysload and temp set different settings
 	if (cpuload >= minperc)
+		turbo(1);
+	else if (temperature >= 70)
+		turbo (1);
+	else if (sysload >= load_threshold)
 		turbo(1);
 	else
 		turbo(0);
