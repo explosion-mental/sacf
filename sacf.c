@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #ifdef __OpenBSD__
 #include <sys/param.h>
@@ -67,6 +68,21 @@ pscanf(const char *path, const char *fmt, ...)
 	return (n == EOF) ? -1 : n;
 }
 
+static float
+avgload(void)
+{
+	double avg[1];
+
+	/* get the average load over 1 minute */
+	if (getloadavg(avg, 1) < 0) {
+		printf("getloadavg: Failed to obtain load average");
+		return -1;
+	}
+
+	return avg[0];
+}
+
+
 static int
 cpuperc(void)
 {
@@ -98,6 +114,7 @@ cpuperc(void)
 	#ifdef __OpenBSD__
 	//TODO openbsd support
 	#endif /* __OpenBSD__ */
+
 	#ifdef __FreeBSD__
 	//TODO freebsd support
 	#endif
@@ -271,12 +288,18 @@ powersave()
 {
 	const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
 	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
+	int cpuload;
+	float sysload;
 
 	if (access(pp, F_OK) != -1 && access(intel, F_OK) == -1) {
 		printf("Using 'balance_power' governor.");
 		setgovernor("balance_power");
 	}
-	//TODO depending on the cpuload() set different settings
+
+	cpuload = cpuperc();
+	sysload = avgload();
+
+	//TODO depending on the cpuload and sysload set different settings
 
 }
 
