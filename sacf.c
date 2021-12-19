@@ -331,7 +331,7 @@ powersave()
 
 	if (cpuload >= minperc)
 		turbo(1);
-	else if (temperature >= mintemp)
+	else if (temp >= mintemp)
 		turbo (1);
 	else if (sysload >= load_threshold)
 		turbo(1);
