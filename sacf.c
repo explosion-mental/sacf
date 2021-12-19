@@ -30,18 +30,12 @@
 /* macros */
 #define LENGTH(a)               (sizeof(a) / sizeof(a)[0])
 #define ABS(a)			((a) > 0 ? (a) : -(a))
-//TODO function that reads this enums and returns the desired value (fscanf /proc)
-enum { POWERSAVE, TURBO, CPUS };
 
-static const char *governors[] = {
-    "performance",
-    "ondemand",
-    "conservative",
-    "schedutil",
-    "userspace",
-    "powersave",
-};
-static int turbostate;
+/* variables */
+static const char *governors[] = { "performance", "ondemand", "conservative",
+					"schedutil", "userspace", "powersave" };
+static const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
+static const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
 
 #include "config.h"
 
@@ -51,6 +45,7 @@ usage(void)
 	die("usage: sacf [-ctv]");
 }
 
+//TODO merge this func
 static int
 pscanf(const char *path, const char *fmt, ...)
 {
@@ -195,37 +190,6 @@ nproc(void)
 
 }
 
-//#include <time.h>
-static int
-cpuload(void)
-{
-	//TODO get the cpu load over 1 second interval
-	float up1, up2, idle1, idle2;
-	FILE *fp = NULL;
-	//clock
-
-	/* first reading */
-	fp = fopen("/proc/uptime", "r");
-	fscanf(fp, "%f %f", &up1, &idle1);
-	printf("uptime1: %f\nidle1: %f\n", up1, idle1);
-	fclose(fp);
-
-	sleep(1);
-
-	/* second reading */
-	fp = fopen("/proc/uptime", "r");
-	fscanf(fp, "%f %f", &up2, &idle2);
-	printf("uptime2: %f\nidle2: %f\n", up2, idle2);
-	fclose(fp);
-
-
-
-	//% CPU usage = (CPU time) / (# of cores) / (wall time)
-	//CPU usage =  100 - 100 * (idle2 - idle1) / (uptime2 - uptime1)
-	return 0;
-}
-
-//this should return an exit status.
 static void
 turbo(int on)
 {
@@ -234,11 +198,9 @@ turbo(int on)
 	const char boost[] = "/sys/devices/system/cpu/cpufreq/boost";
 
 	/* figure what path to use */
-	if (access(intel, F_OK) != -1) {
-		//fp = intel;
+	if (access(intel, F_OK) != -1)
 		fp = fopen(intel, "w");
-	} else if (access(boost, F_OK) != -1) {
-		//fp = boost;
+	else if (access(boost, F_OK) != -1)
 		fp = fopen(boost, "w");
 	} else {
 		fprintf(stderr, "CPU turbo is not available.\n");
@@ -250,9 +212,8 @@ turbo(int on)
 	    exit(1);
 	}
 
-	/* change state of the turbo */
+	/* change state of turbo boost */
 	fprintf(fp, "%d\n", on);
-	turbostate = on;
 
 	fclose(fp);
 }
@@ -310,11 +271,6 @@ setgovernor(char *governor)
 	}
 
 }
-
-
-static const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
-static const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
-
 
 static void
 run(void)
