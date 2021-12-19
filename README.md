@@ -26,4 +26,3 @@ TODO
 ====
 - freebsd and openbsd support
 - man page
-- variable (config.h) whether to have turbo boost always on.

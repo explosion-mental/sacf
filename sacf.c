@@ -280,6 +280,11 @@ run(void)
 		setgovernor("performance");
 
 
+	if (alwaysturbo) {
+		turbo(1);
+		return;
+	}
+
 	cpuload = cpuperc();
 	sysload = avgload();
 	temp = temperature();
