@@ -298,32 +298,46 @@ setgovernor(char *governor)
 		printf("%s\n", tmp);
 
 		/* set the governor of cpu i */
-		fp = fopen(tmp, "w");
-		if (fp == NULL) {
+		if ((fp = fopen(tmp, "w")) != NULL)
+			fprintf(fp, "%s\n", governor);
+		else {
 			fprintf(stderr, "Error opening file. Are you root?\n");
-			exit(1);
-		} else
-		fprintf(fp, "%s\n", governor);
-		//perror(""); //use perror and output whether they are missing privileges
+			exit(1); // if no file is open, then no file needs to be closed
+			//perror(""); //use perror and output whether they are missing privileges
+		}
+
 		fclose(fp);
 	}
 
 }
 
+
+static const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
+static const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
+
+
 static void
-powersave()
+run(void)
 {
-	const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
-	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
 	int cpuload, temp;
 	float sysload;
-	int load_threshold = (75 * nproc()) / 100;
-
+	int powersave_load_threshold = (75 * nproc()) / 100;
+	int performance_load_threshold = (50 * nproc()) / 100;
+	int charge = ischarging();
 
 	if (access(pp, F_OK) != -1 && access(intel, F_OK) == -1) {
-		//printf("Using 'balance_power' governor.");
-		setgovernor("balance_power");
+		if (charge)
+			setgovernor("balance_performance");
+		else
+			setgovernor("balance_power");
 	}
+	//else
+
+	if (charge)
+		setgovernor("performance");
+	else
+		setgovernor("powersave");
+
 
 	cpuload = cpuperc();
 	sysload = avgload();
@@ -331,7 +345,7 @@ powersave()
 
 	if (cpuload >= minperc
 	|| temp >= mintemp
-	|| sysload >= load_threshold)
+	|| sysload >= powersave_load_threshold)
 		turbo(1);
 	else
 		turbo(0);
