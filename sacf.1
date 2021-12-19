@@ -1,0 +1,34 @@
+.TH sacf 1 sacf\-VERSION
+.SH NAME
+sacf \- simple auto cpu frequencer
+.SH SYNOPSIS
+.B sacf
+.RB [ \-ltTv ]
+.RB [ \-g
+.IR governor ]
+.P
+.SH DESCRIPTION
+.B sacf
+is a simple auto cpu frequencer daemon that only changes two things: the
+governor and turbo boost state; depending on the cpu load, system load and the
+temperature. Made primarly for latops, since laptops could have an AC adapter
+or use the battery.
+.P
+.SH OPTIONS
+.BI \-g " governor"
+sets the governor of all cpus to governor, then exits.
+.TP
+.B \-l
+prints the system info that sacf needs, then exits.
+.TP
+.B \-t
+enables turbo boost for all cpus, then exits.
+.TP
+.B \-T
+disbles turbo boost for all cpus, then exits.
+.TP
+.B \-v
+prints version information to stdout, then exits.
+.TP
+.SH SEE ALSO
+.IR auto-cpufreq (1),
