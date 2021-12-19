@@ -321,7 +321,7 @@ powersave()
 
 
 	if (access(pp, F_OK) != -1 && access(intel, F_OK) == -1) {
-		printf("Using 'balance_power' governor.");
+		//printf("Using 'balance_power' governor.");
 		setgovernor("balance_power");
 	}
 
@@ -329,11 +329,9 @@ powersave()
 	sysload = avgload();
 	temp = temperature();
 
-	if (cpuload >= minperc)
-		turbo(1);
-	else if (temp >= mintemp)
-		turbo (1);
-	else if (sysload >= load_threshold)
+	if (cpuload >= minperc
+	|| temp >= mintemp
+	|| sysload >= load_threshold)
 		turbo(1);
 	else
 		turbo(0);
