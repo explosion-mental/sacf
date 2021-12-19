@@ -10,6 +10,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+
+#ifdef __OpenBSD__
+#include <sys/param.h>
+#include <sys/sched.h>
+#include <sys/sysctl.h>
+#endif
+
+#ifdef __FreeBSD__
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#include <devstat.h>
+#endif
+
 
 #include "util.h"
 /* macros */
@@ -28,13 +42,69 @@ static const char *governors[] = {
 };
 static int turbostate;
 
-void
+static void
 usage(void)
 {
 	die("usage: sacf [-ctv]");
 }
 
-void
+static int
+pscanf(const char *path, const char *fmt, ...)
+{
+	FILE *fp;
+	va_list ap;
+	int n;
+
+	if (!(fp = fopen(path, "r"))) {
+		fprintf(stderr, "fopen '%s':", path);
+		return -1;
+	}
+	va_start(ap, fmt);
+	n = vfscanf(fp, fmt, ap);
+	va_end(ap);
+	fclose(fp);
+
+	return (n == EOF) ? -1 : n;
+}
+
+static int
+cpuperc(void)
+{
+	#ifdef __linux__
+	static long double a[7];
+	long double b[7], sum;
+
+	memcpy(b, a, sizeof(b));
+	/* cpu user nice system idle iowait irq softirq */
+	if (pscanf("/proc/stat", "%*s %Lf %Lf %Lf %Lf %Lf %Lf %Lf",
+	           &a[0], &a[1], &a[2], &a[3], &a[4], &a[5], &a[6])
+	    != 7)
+		return -1;
+
+	if (b[0] == 0)
+		return -1;
+
+	sum = (b[0] + b[1] + b[2] + b[3] + b[4] + b[5] + b[6]) -
+	      (a[0] + a[1] + a[2] + a[3] + a[4] + a[5] + a[6]);
+
+	if (sum == 0)
+		return -1;
+
+	return (int)(100 *
+	               ((b[0] + b[1] + b[2] + b[5] + b[6]) -
+	                (a[0] + a[1] + a[2] + a[5] + a[6])) / sum);
+	#endif /* __linux__ */
+
+	#ifdef __OpenBSD__
+	//TODO openbsd support
+	#endif /* __OpenBSD__ */
+	#ifdef __FreeBSD__
+	//TODO freebsd support
+	#endif
+}
+
+
+static void
 daemonize(void)
 {
 	pid_t id = 0;
@@ -66,7 +136,7 @@ daemonize(void)
 
 }
 
-char
+static char
 ischarging()
 {
 	FILE *fp;
@@ -89,7 +159,7 @@ ischarging()
 	return online;
 }
 
-unsigned int
+static unsigned int
 nproc(void)
 {
 	unsigned int cores, threads;
