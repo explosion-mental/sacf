@@ -7,7 +7,7 @@ governors and decided whether to use turbo boost or not.
 
 Usage
 -----
-With no arguments it runs as daemon (currently the daemon does nothing)
+With no arguments it runs as daemon
 
 	sacf [-cvltT]
 

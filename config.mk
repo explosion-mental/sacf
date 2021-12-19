@@ -16,4 +16,3 @@ LDFLAGS += -g
 
 # compiler and linker
 CC = cc
-#CC = tcc

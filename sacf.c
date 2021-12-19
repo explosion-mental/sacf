@@ -34,12 +34,6 @@
 
 #include "config.h"
 
-static void
-usage(void)
-{
-	die("usage: sacf [-ctv]");
-}
-
 //TODO merge this func
 static int
 pscanf(const char *path, const char *fmt, ...)
@@ -169,7 +163,8 @@ ischarging()
 static unsigned int
 nproc(void)
 {
-	unsigned int cores, threads;
+	//unsigned int cores;
+	unsigned int threads;
 	FILE *fp = fopen("/proc/cpuinfo", "r");
 
 	while (!fscanf(fp, "siblings\t: %u", &threads))
@@ -297,6 +292,12 @@ run(void)
 		turbo(0);
 }
 
+static void
+usage(void)
+{
+	die("usage: sacf [-gltTv]");
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -307,8 +308,11 @@ main(int argc, char *argv[])
 		if (!strcmp(argv[i], "-v")) {      /* prints version information */
 			puts("sacf-"VERSION);
 			exit(0);
-		} else if (!strcmp(argv[i], "-l")) { /* number of cores */
-			printf("Cores: %u\n", nproc());
+		} else if (!strcmp(argv[i], "-l")) { /* info that sacf uses */
+			fprintf(stdout, "Cores: %u\n", nproc());
+			fprintf(stdout, "AC adapter status: %c\n", ischarging());
+			fprintf(stdout, "Average system load: %f\n", avgload());
+			fprintf(stdout, "System temperature: %d °C\n", temperature());
 			exit(0);
 		} else if (!strcmp(argv[i], "-t")) { /* turbo on */
 			turbo(1);
@@ -316,15 +320,14 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-T")) { /* turbo off */
 			turbo(0);
 			exit(0);
-		} else if (!strcmp(argv[i], "-c")) { /* AC adapter status */
-			printf("AC adapter status: %c\n", ischarging());
-			exit(0);
-		} else if (!strcmp(argv[i], "-p")) { /* set gorvenor to powersave */
-			setgovernor("powersave");
+		}
+		else if (i + 1 == argc)
+			usage();
+		/* these options take one argument */
+		else if (!strcmp(argv[i], "-g")) { /* set governor */
+			setgovernor(argv[++i]);
 			exit(0);
 		}
-		//else if (i + 1 == argc)
-		//	usage();
 		else
 			usage();
 
