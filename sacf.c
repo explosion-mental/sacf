@@ -323,6 +323,9 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-T")) { /* turbo off */
 			turbo(0);
 			exit(0);
+		} else if (!strcmp(argv[i], "-b")
+			|| !strcmp(argv[i], "--daemon")) { /* turbo off */
+			daemonize();
 		}
 		else if (i + 1 == argc)
 			usage();
@@ -333,8 +336,6 @@ main(int argc, char *argv[])
 		}
 		else
 			usage();
-
-	daemonize();
 
 	while (1) {
 		/* use 1 seconds if the interval is set to 0 */
