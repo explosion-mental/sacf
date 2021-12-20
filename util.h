@@ -6,3 +6,4 @@
 
 void die(const char *fmt, ...);
 void *ecalloc(size_t nmemb, size_t size);
+int pscanf(const char *path, const char *fmt, ...);
