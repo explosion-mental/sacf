@@ -161,8 +161,7 @@ setgovernor(char *governor)
 
 	for (i = 0; i < nproc(); i++) {
 		/* store the path of cpu i on tmp */
-		snprintf(tmp, LENGTH(tmp), "%s%d", path, i);
-		strncat(tmp, end, LENGTH(end));
+		snprintf(tmp, LENGTH(tmp), "%s%d%s", path, i, end);
 
 		/* set the governor of cpu i */
 		if ((fp = fopen(tmp, "w")) != NULL)
