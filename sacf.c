@@ -243,7 +243,7 @@ turbo(int on)
 	if (getturbo() == on)
 		return;
 
-	FILE *fp = fopen(turbopath(), "r");
+	FILE *fp = fopen(turbopath(), "w");
 	if (fp == NULL)
 		return;
 	/* change state of turbo boost */
