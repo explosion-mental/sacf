@@ -324,7 +324,7 @@ main(int argc, char *argv[])
 			turbo(0);
 			exit(0);
 		} else if (!strcmp(argv[i], "-b")
-			|| !strcmp(argv[i], "--daemon")) { /* turbo off */
+			|| !strcmp(argv[i], "--daemon")) { /* daemon */
 			daemonize();
 		}
 		else if (i + 1 == argc)
