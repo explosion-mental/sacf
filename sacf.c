@@ -241,6 +241,10 @@ temperature(void)
 static void
 turbo(int on)
 {
+	/* do nothing if the turbo state is already as desired */
+	if (getturbo() == on)
+		return;
+
 	FILE *fp = fopen(turbopath(), "r");
 	if (fp == NULL)
 		return;
@@ -254,13 +258,16 @@ static void
 run(void)
 {
 
-	int cpuload, temp;
+	int cpuload, temp, load_threshold;
 	float sysload;
 	const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
 	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
-
-	int load_threshold = (75 * nproc()) / 100;
 	int bat = ischarging();
+
+	if (bat)
+		setgovernor("powersave");
+	else
+		setgovernor("performance");
 
 	/* if energy_performance_preference exist and no intel_pstate, use
 	 * balance governor */
@@ -271,17 +278,12 @@ run(void)
 			setgovernor("balance_performance");
 	}
 
-	if (bat)
-		setgovernor("powersave");
-	else
-		setgovernor("performance");
-
-
 	if (alwaysturbo) {
 		turbo(1);
 		return;
 	}
 
+	load_threshold = (75 * nproc()) / 100;
 	cpuload = cpuperc();
 	sysload = avgload();
 	temp = temperature();
