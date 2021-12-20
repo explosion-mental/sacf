@@ -151,8 +151,8 @@ nproc(void)
 static const char *
 turbopath(void)
 {
-	const char intel[] = "/sys/devices/system/cpu/intel_pstate/no_turbo";
-	const char boost[] = "/sys/devices/system/cpu/cpufreq/boost";
+	const char *intel = "/sys/devices/system/cpu/intel_pstate/no_turbo";
+	const char *boost = "/sys/devices/system/cpu/cpufreq/boost";
 	const char *ret;
 
 	/* figure what path to use */
