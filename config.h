@@ -3,3 +3,7 @@ static const int mincpu      = 20;       /* percentage number where turbo boost 
 static const int mintemp     = 70;       /* minimum degrees (celsius) where turbo boost is enabled */
 static const int interval    = 5;        /* seconds to wait before running */
 static const int alwaysturbo = 0;        /* 1 means never disables turbo boost */
+/* default governor to use when using the battery */
+static const char batgovernor[] = "powersave";
+/* default governor to use when AC adapter is connected */
+static const char acgovernor[]  = "performance";

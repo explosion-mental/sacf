@@ -108,7 +108,6 @@ daemonize(void)
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
-
 }
 
 static char
@@ -189,7 +188,7 @@ getturbo(void)
 }
 
 static void
-setgovernor(char *governor)
+setgovernor(const char *governor)
 {
 	FILE *fp = NULL;
 	const char path[] = "/sys/devices/system/cpu/cpu";
@@ -210,7 +209,6 @@ setgovernor(char *governor)
 
 		fclose(fp);
 	}
-
 }
 
 static int
@@ -257,7 +255,6 @@ turbo(int on)
 static void
 run(void)
 {
-
 	int cpuload, temp, load_threshold;
 	float sysload;
 	const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
@@ -265,9 +262,9 @@ run(void)
 	int bat = ischarging();
 
 	if (bat)
-		setgovernor("powersave");
+		setgovernor(batgovernor);
 	else
-		setgovernor("performance");
+		setgovernor(acgovernor);
 
 	/* if energy_performance_preference exist and no intel_pstate, use
 	 * balance governor */
