@@ -6,10 +6,11 @@ turbo boost only when it needs to.
 
 Usage
 -----
-Invoke with no arguments sacf will start to run and do simple changes. For more
-detail information read the man page.
+Invoke with no arguments sacf will start to run and do simple changes.
 
     sacf [-bltTv] [-g governor]
+
+For more  detail information read the man page.
 
 
 Installation
