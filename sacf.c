@@ -296,7 +296,7 @@ run(void)
 static void
 usage(void)
 {
-	die("usage: sacf [-gltTv]");
+	die("usage: sacf [-bltTv] [-g governor]");
 }
 
 int

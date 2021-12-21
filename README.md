@@ -1,14 +1,15 @@
 scaf - simple auto cpu frequencer
 =================================
-sacf it's a daemon that monitors the cpu usage, system load and the temperature
-over 5 seconds, by default, and simply tweak governors and decides whether to
-use turbo boost or not.
+sacf it's a simple program that monitors the cpu usage, system load and the
+temperature over 5 seconds, by default, and simply tweaks the governors and
+turbo boost only when it needs to.
 
 Usage
 -----
-With no arguments it runs as a daemon. It needs root access.
+Invoke with no arguments sacf will start to run and do simple changes. For more
+detail information read the man page.
 
-    sacf [-ltTv] [-g governor]
+    sacf [-bltTv] [-g governor]
 
 
 Installation
