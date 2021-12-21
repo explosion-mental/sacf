@@ -9,10 +9,11 @@ sacf \- simple auto cpu frequencer
 .P
 .SH DESCRIPTION
 .B sacf
-is a simple auto cpu frequencer that only changes two things: the
-governor and turbo boost state; depending on the cpu load, system load and the
-temperature. Made primarly for latops, since laptops could have an AC adapter
-or use the battery. It needs root access to write to the system filesystem.
+is a simple auto cpu frequencer that only changes two things: the governor and
+turbo boost state; depending on the cpu load, system load and the temperature.
+Machines that have a battery and most of the time depend on it are the target,
+but since it reduces the power consumption in general it can be beneficial
+anyway, in theory. It needs root access to write to the system filesystem.
 .P
 .SH OPTIONS
 .BR \-b ", " \-\-daemon
