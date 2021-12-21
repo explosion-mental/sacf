@@ -153,19 +153,14 @@ turbopath(void)
 {
 	const char *intel = "/sys/devices/system/cpu/intel_pstate/no_turbo";
 	const char *boost = "/sys/devices/system/cpu/cpufreq/boost";
-	const char *ret;
 
 	/* figure what path to use */
 	if (access(intel, F_OK) != -1)
-		ret = intel;
+		return intel;
 	else if (access(boost, F_OK) != -1)
-		ret = boost;
-	else {
-		//fprintf(stderr, "CPU turbo is not available.\n");
+		return boost;
+	else /* cpu turbo it's not avaliable */
 		return NULL;
-	}
-
-	return ret;
 }
 
 static char
@@ -324,7 +319,7 @@ main(int argc, char *argv[])
 			turbo(0);
 			exit(0);
 		} else if (!strcmp(argv[i], "-b")
-			|| !strcmp(argv[i], "--daemon")) { /* daemon */
+			|| !strcmp(argv[i], "--daemon")) { /* daemon mode */
 			daemonize();
 		}
 		else if (i + 1 == argc)
