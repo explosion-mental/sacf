@@ -38,7 +38,7 @@ avgload(void)
 
 	/* get the average load over 1 minute */
 	if (getloadavg(avg, 1) < 0) {
-		printf("getloadavg: Failed to obtain load average");
+		//printf("getloadavg: Failed to obtain load average");
 		return -1;
 	}
 
@@ -82,7 +82,6 @@ cpuperc(void)
 	//TODO freebsd support
 	#endif
 }
-
 
 static void
 daemonize(void)
@@ -134,17 +133,16 @@ ischarging()
 static unsigned int
 nproc(void)
 {
-	//unsigned int cores;
 	unsigned int threads;
 	FILE *fp = fopen("/proc/cpuinfo", "r");
 
+	if (fp == NULL)
+		return -1;
+
 	while (!fscanf(fp, "siblings\t: %u", &threads))
 		fscanf(fp, "%*[^s]");
-	//while (!fscanf(fp, "cpu cores\t: %u", &cores))
-	//	fscanf(fp, "%*[^c]");
 	fclose(fp);
 
-	//return cores;
 	return threads;
 }
 
@@ -212,6 +210,7 @@ temperature(void)
 	#ifdef __linux__
 	//uintmax_t temp;
 	unsigned int temp;
+	//TODO on some systems, there could exist multiple path, so get an avg
 	char file[] = "/sys/class/thermal/thermal_zone0/temp";
 
 	if (pscanf(file, "%u", &temp) != 1) {
