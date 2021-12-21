@@ -34,15 +34,15 @@
 static float
 avgload(void)
 {
-	double avg[1];
+	double avg;
 
 	/* get the average load over 1 minute */
-	if (getloadavg(avg, 1) < 0) {
+	if (getloadavg(&avg, 1) < 0) {
 		//printf("getloadavg: Failed to obtain load average");
 		return -1;
 	}
 
-	return avg[0];
+	return avg;
 }
 
 
