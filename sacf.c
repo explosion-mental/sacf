@@ -188,12 +188,12 @@ setgovernor(const char *governor)
 	FILE *fp = NULL;
 	const char path[] = "/sys/devices/system/cpu/cpu";
 	const char end[] = "/cpufreq/scaling_governor";
-	char tmp[LENGTH(path) + sizeof(char) + LENGTH(end)];
-	int i;
+	char tmp[LENGTH(path) + sizeof(unsigned int) + LENGTH(end)];
+	unsigned int i;
 
 	for (i = 0; i < nproc(); i++) {
 		/* store the path of cpu i on tmp */
-		snprintf(tmp, LENGTH(tmp), "%s%d%s", path, i, end);
+		snprintf(tmp, LENGTH(tmp), "%s%u%s", path, i, end);
 
 		/* set the governor of cpu i */
 		if ((fp = fopen(tmp, "w")) != NULL)
