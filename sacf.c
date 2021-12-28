@@ -116,9 +116,10 @@ ischarging()
 	//TODO handle multiple AC online ?
 
 	//there has to be a better way?
-	FILE *fp = popen("/bin/grep . /sys/class/power_supply/A*/online", "r");
+	FILE *fp = popen("/bin/grep . /sys/class/power_supply/A*/online 2>/dev/null", "r");
 	if (fp == NULL)
-		die("Failed to run grep.");
+		return -1;
+		//die("Failed to run grep.");
 
 	//while (fgets(online, sizeof(online), fp) != NULL) {
 	//online = fgetc(fp);
@@ -150,7 +151,7 @@ static const char *
 turbopath(void)
 {
 	static const char intel[] = "/sys/devices/system/cpu/intel_pstate/no_turbo";
-	static const char boost[] = "/sys/devices/system/cpu/cpufreq/boost";
+	static const char boost[] = "/sys/devices/system/cpu/cpufreq/boost00";
 
 	/* figure what path to use */
 	if (access(intel, F_OK) != -1)
@@ -166,6 +167,10 @@ getturbo(void)
 {
 	//FIXME temporal solution, should be using fopen and fgetc
 	char tmp[50], state;
+
+	if (turbopath() == NULL)
+		return -1;
+
 	snprintf(tmp, LENGTH(tmp), "cat %s", turbopath());
 
 	FILE *fp = popen(tmp, "r");
@@ -233,13 +238,17 @@ temperature(void)
 static void
 turbo(int on)
 {
+	int i = getturbo();
+
 	/* do nothing if the turbo state is already as desired */
-	if (getturbo() == on)
+	if (i != -1 && i == on)
 		return;
 
 	FILE *fp = fopen(turbopath(), "w");
+
 	if (fp == NULL)
 		return;
+
 	/* change state of turbo boost */
 	fprintf(fp, "%d\n", on);
 
@@ -304,12 +313,19 @@ main(int argc, char *argv[])
 			puts("sacf-"VERSION);
 			exit(0);
 		} else if (!strcmp(argv[i], "-l")) { /* info that sacf uses */
+			const char *tp = turbopath();
 			fprintf(stdout, "Cores: %u\n", nproc());
-			fprintf(stdout, "AC adapter status: %c\n", ischarging());
+			if (ischarging() != -1)
+				fprintf(stdout, "AC adapter status: %c\n", ischarging());
+			else
+				fprintf(stdout, "AC adapter status could not be retrieved.\n");
 			fprintf(stdout, "Average system load: %0.2f\n", avgload());
 			fprintf(stdout, "System temperature: %d °C\n", temperature());
-			fprintf(stdout, "Turbo state: %c\n", getturbo());
-			fprintf(stdout, "Turbo path: %s\n", turbopath());
+			if (tp != NULL) {
+				fprintf(stdout, "Turbo state: %c\n", getturbo());
+				fprintf(stdout, "Turbo path: %s\n", tp);
+			} else
+				fprintf(stdout, "CPU turbo boost is not available.\n");
 			exit(0);
 		} else if (!strcmp(argv[i], "-t")) { /* turbo on */
 			turbo(1);
