@@ -151,7 +151,7 @@ static const char *
 turbopath(void)
 {
 	static const char intel[] = "/sys/devices/system/cpu/intel_pstate/no_turbo";
-	static const char boost[] = "/sys/devices/system/cpu/cpufreq/boost00";
+	static const char boost[] = "/sys/devices/system/cpu/cpufreq/boost";
 
 	/* figure what path to use */
 	if (access(intel, F_OK) != -1)
