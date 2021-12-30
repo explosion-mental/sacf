@@ -27,4 +27,4 @@ Afterwards enter the following command to build and install sacf
 TODO
 ====
 - freebsd and openbsd support
-- better detection of battery
+- better detection of battery (use **acpi**)
