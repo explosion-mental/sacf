@@ -15,4 +15,4 @@ LDFLAGS  = -g
 #LDFLAGS +=
 
 # compiler and linker
-CC ?= cc
+CC = cc
