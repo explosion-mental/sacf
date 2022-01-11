@@ -3,7 +3,7 @@
 sacf \- simple auto cpu frequencer
 .SH SYNOPSIS
 .B sacf
-.RB [ \-bltTv ]
+.RB [ \-blrtTv ]
 .RB [ \-g
 .IR governor ]
 .P
@@ -24,6 +24,9 @@ sets the governor of all cpus to governor, then exits.
 .TP
 .B \-l
 prints the system info that sacf uses, then exits.
+.TP
+.B \-r
+runs once, then exits (doesn't run forever).
 .TP
 .B \-t
 enables turbo boost, then exits.

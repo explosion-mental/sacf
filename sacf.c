@@ -299,7 +299,7 @@ run(void)
 static void
 usage(void)
 {
-	die("usage: sacf [-bltTv] [-g governor]");
+	die("usage: sacf [-blrtTv] [-g governor]");
 }
 
 int
@@ -332,6 +332,9 @@ main(int argc, char *argv[])
 			exit(0);
 		} else if (!strcmp(argv[i], "-T")) { /* turbo off */
 			turbo(0);
+			exit(0);
+		} else if (!strcmp(argv[i], "-r")) { /* run once */
+			run()
 			exit(0);
 		} else if (!strcmp(argv[i], "-b")
 			|| !strcmp(argv[i], "--daemon")) { /* daemon mode */
