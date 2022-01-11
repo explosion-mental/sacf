@@ -334,7 +334,7 @@ main(int argc, char *argv[])
 			turbo(0);
 			exit(0);
 		} else if (!strcmp(argv[i], "-r")) { /* run once */
-			run()
+			run();
 			exit(0);
 		} else if (!strcmp(argv[i], "-b")
 			|| !strcmp(argv[i], "--daemon")) { /* daemon mode */
