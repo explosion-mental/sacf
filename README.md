@@ -6,7 +6,7 @@ turbo boost only when it needs to.
 
 Usage
 -----
-Invoke with no arguments sacf will start to run and do simple changes.
+With no arguments sacf will start to run, a successful run will require sudo privileges (permissions to write on /sys/).
 
     sacf [-bltTv] [-g governor]
 
