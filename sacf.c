@@ -210,7 +210,7 @@ setgovernor(const char *governor)
 }
 
 static int
-temperature(void)
+avgtemp(void)
 {
 	#ifdef __linux__
 	//uintmax_t temp;
@@ -258,16 +258,9 @@ turbo(int on)
 static void
 run(void)
 {
-	int cpuload, temp, load_threshold;
-	float sysload;
 	const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
 	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
 	int bat = ischarging();
-
-	if (bat)
-		setgovernor(batgovernor);
-	else
-		setgovernor(acgovernor);
 
 	/* if energy_performance_preference exist and no intel_pstate, use
 	 * balance governor */
@@ -276,6 +269,11 @@ run(void)
 			setgovernor("balance_power");
 		else
 			setgovernor("balance_performance");
+	} else { /* use default governors */
+		if (bat)
+			setgovernor(batgovernor);
+		else
+			setgovernor(acgovernor);
 	}
 
 	if (alwaysturbo) {
@@ -283,13 +281,11 @@ run(void)
 		return;
 	}
 
-	load_threshold = (75 * nproc()) / 100;
-	cpuload = cpuperc();
-	sysload = avgload();
-	temp = temperature();
+	float load_threshold = (75 * nproc()) / 100;
+	float sysload = avgload();
 
-	if (cpuload >= mincpu
-	|| temp >= mintemp
+	if (cpuperc() >= mincpu
+	|| avgtemp() >= mintemp
 	|| sysload >= load_threshold)
 		turbo(1);
 	else
@@ -320,7 +316,7 @@ main(int argc, char *argv[])
 			else
 				fprintf(stdout, "AC adapter status could not be retrieved.\n");
 			fprintf(stdout, "Average system load: %0.2f\n", avgload());
-			fprintf(stdout, "System temperature: %d °C\n", temperature());
+			fprintf(stdout, "System temperature: %d °C\n", avgtemp());
 			if (tp != NULL) {
 				fprintf(stdout, "Turbo state: %c\n", getturbo());
 				fprintf(stdout, "Turbo path: %s\n", tp);
