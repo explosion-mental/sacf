@@ -256,13 +256,13 @@ turbo(int on)
 static void
 run(void)
 {
-	const char pp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
+	const char epp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
 	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
 	int bat = ischarging();
 
 	/* if energy_performance_preference exist and no intel_pstate, use
 	 * balance governor */
-	if (access(pp, F_OK) != -1 && access(intel, F_OK) == -1) {
+	if (access(epp, F_OK) != -1 && access(intel, F_OK) == -1) {
 		if (bat)
 			setgovernor("balance_power");
 		else
