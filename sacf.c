@@ -282,12 +282,9 @@ run(void)
 	float load_threshold = (75 * nproc()) / 100;
 	float sysload = avgload();
 
-	if (cpuperc() >= mincpu
+	turbo(cpuperc() >= mincpu
 	|| avgtemp() >= mintemp
-	|| sysload >= load_threshold)
-		turbo(1);
-	else
-		turbo(0);
+	|| sysload >= load_threshold ? 1 : 0);
 }
 
 static void
