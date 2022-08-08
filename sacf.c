@@ -29,7 +29,19 @@
 /* macros */
 #define LENGTH(a)               (sizeof(a) / sizeof(a)[0])
 
+/* enums */
+enum { INTEL, CPUFREQ, BROKEN };
+
+static const char *turbos[] = {
+	[INTEL]   = "/sys/devices/system/cpu/intel_pstate/no_turbo",
+	[CPUFREQ] = "/sys/devices/system/cpu/cpufreq/boost",
+	[BROKEN]  = "",
+};
+
+static char turbopath[50];
+
 #include "config.h"
+
 
 static float
 avgload(void)
@@ -148,32 +160,17 @@ nproc(void)
 	return threads;
 }
 
-static const char *
-turbopath(void)
-{
-	static const char intel[] = "/sys/devices/system/cpu/intel_pstate/no_turbo";
-	static const char boost[] = "/sys/devices/system/cpu/cpufreq/boost";
-
-	/* figure what path to use */
-	if (access(intel, F_OK) != -1)
-		return intel;
-	else if (access(boost, F_OK) != -1)
-		return boost;
-	else /* cpu turbo it's not avaliable */
-		return NULL;
-}
-
 static char
 getturbo(void)
 {
 	//FIXME temporal solution, should be using fopen and fgetc
-	char cmd[50], state;
+	char cmd[sizeof(turbopath) + 4], state;
 	FILE *fp;
 
-	if (turbopath() == NULL)
+	if (turbopath[0] == '\0')
 		return -1;
 
-	snprintf(cmd, LENGTH(cmd), "cat %s", turbopath());
+	snprintf(cmd, sizeof(cmd), "cat %s", turbopath);
 
 	if (!(fp = popen(cmd, "r")))
 		return -1;
@@ -244,7 +241,7 @@ turbo(int on)
 	if (i != -1 && i == on)
 		return;
 
-	if (!(fp = fopen(turbopath(), "w")))
+	if (!(fp = fopen(turbopath, "w")))
 		return;
 
 	/* change state of turbo boost */
@@ -298,13 +295,20 @@ main(int argc, char *argv[])
 {
 	int i;
 
+	/* figure what path to use */
+	if (access(turbos[INTEL], F_OK) != -1)
+		strncpy(turbopath, turbos[INTEL], sizeof turbopath);
+	else if (access(turbos[CPUFREQ], F_OK) != -1)
+		strncpy(turbopath, turbos[CPUFREQ], sizeof turbopath);
+	else
+		strncpy(turbopath, turbos[BROKEN], sizeof turbopath);
+
 	for (i = 1; i < argc; i++)
 		/* these options take no arguments */
 		if (!strcmp(argv[i], "-v")) {      /* prints version information */
 			puts("sacf-"VERSION);
 			exit(0);
 		} else if (!strcmp(argv[i], "-l")) { /* info that sacf uses */
-			const char *tp = turbopath();
 			fprintf(stdout, "Cores: %u\n", nproc());
 			if (ischarging() != -1)
 				fprintf(stdout, "AC adapter status: %c\n", ischarging());
@@ -312,9 +316,9 @@ main(int argc, char *argv[])
 				fprintf(stdout, "AC adapter status could not be retrieved.\n");
 			fprintf(stdout, "Average system load: %0.2f\n", avgload());
 			fprintf(stdout, "System temperature: %d °C\n", avgtemp());
-			if (tp != NULL) {
+			if (turbopath[0] != '\0') {
 				fprintf(stdout, "Turbo state: %c\n", getturbo());
-				fprintf(stdout, "Turbo path: %s\n", tp);
+				fprintf(stdout, "Turbo path: %s\n", turbopath);
 			} else
 				fprintf(stdout, "CPU turbo boost is not available.\n");
 			exit(0);
