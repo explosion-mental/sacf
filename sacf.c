@@ -101,7 +101,7 @@ daemonize(void)
 
 	/* new session */
 	if (setsid() < 0)
-		exit(1);
+		die("setsid failed:");
 
 	/* close stdin, stdout and stderr */
 	close(STDIN_FILENO);
@@ -142,6 +142,7 @@ nproc(void)
 
 	while (!fscanf(fp, "siblings\t: %u", &threads))
 		fscanf(fp, "%*[^s]");
+
 	fclose(fp);
 
 	return threads;
@@ -166,16 +167,15 @@ static char
 getturbo(void)
 {
 	//FIXME temporal solution, should be using fopen and fgetc
-	char tmp[50], state;
+	char cmd[50], state;
+	FILE *fp;
 
 	if (turbopath() == NULL)
 		return -1;
 
-	snprintf(tmp, LENGTH(tmp), "cat %s", turbopath());
+	snprintf(cmd, LENGTH(cmd), "cat %s", turbopath());
 
-	FILE *fp = popen(tmp, "r");
-
-	if (fp == NULL)
+	if (!(fp = popen(cmd, "r")))
 		return -1;
 
 	/* it's only one character (0 or 1) */
@@ -188,11 +188,11 @@ getturbo(void)
 static void
 setgovernor(const char *governor)
 {
-	FILE *fp = NULL;
+	FILE *fp;
 	const char path[] = "/sys/devices/system/cpu/cpu";
 	const char end[] = "/cpufreq/scaling_governor";
-	char tmp[LENGTH(path) + sizeof(unsigned int) + LENGTH(end)];
 	unsigned int i;
+	char tmp[LENGTH(path) + sizeof(i) + LENGTH(end)];
 
 	for (i = 0; i < nproc(); i++) {
 		/* store the path of cpu i on tmp */
@@ -202,8 +202,7 @@ setgovernor(const char *governor)
 		if ((fp = fopen(tmp, "w")) != NULL)
 			fprintf(fp, "%s\n", governor);
 		else
-			die("Error opening file");
-			//perror(""); //use perror and output whether they are missing privileges
+			die("Error opening file, fopen failed:");
 
 		fclose(fp);
 	}
@@ -238,15 +237,14 @@ avgtemp(void)
 static void
 turbo(int on)
 {
+	FILE *fp;
 	int i = getturbo();
 
 	/* do nothing if the turbo state is already as desired */
 	if (i != -1 && i == on)
 		return;
 
-	FILE *fp = fopen(turbopath(), "w");
-
-	if (fp == NULL)
+	if (!(fp = fopen(turbopath(), "w")))
 		return;
 
 	/* change state of turbo boost */
@@ -335,15 +333,13 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-b")
 			|| !strcmp(argv[i], "--daemon")) { /* daemon mode */
 			daemonize();
-		}
-		else if (i + 1 == argc)
+		} else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */
 		else if (!strcmp(argv[i], "-g")) { /* set governor */
 			setgovernor(argv[++i]);
 			exit(0);
-		}
-		else
+		} else
 			usage();
 
 	while (1) {
