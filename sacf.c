@@ -161,21 +161,15 @@ nproc(void)
 static char
 getturbo(void)
 {
-	//FIXME temporal solution, should be using fopen and fgetc
-	char cmd[sizeof(turbopath[ti]) + 4], state;
 	FILE *fp;
+	int state;
 
-	if (ti == BROKEN)
-		return -1;
-
-	snprintf(cmd, sizeof(cmd), "cat %s", turbopath[ti]);
-
-	if (!(fp = popen(cmd, "r")))
+	if (ti == BROKEN || !(fp = fopen(turbopath[ti], "r")))
 		return -1;
 
 	/* it's only one character (0 or 1) */
 	state = getc(fp);
-	pclose(fp);
+	fclose(fp);
 
 	return state;
 }
