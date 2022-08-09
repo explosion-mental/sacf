@@ -32,13 +32,13 @@
 /* enums */
 enum { INTEL, CPUFREQ, BROKEN };
 
-static const char *turbos[] = {
+static const char *turbopath[] = {
 	[INTEL]   = "/sys/devices/system/cpu/intel_pstate/no_turbo",
 	[CPUFREQ] = "/sys/devices/system/cpu/cpufreq/boost",
 	[BROKEN]  = "",
 };
 
-static char turbopath[50];
+static size_t ti = BROKEN; /* turbo index */
 
 #include "config.h"
 
@@ -164,13 +164,13 @@ static char
 getturbo(void)
 {
 	//FIXME temporal solution, should be using fopen and fgetc
-	char cmd[sizeof(turbopath) + 4], state;
+	char cmd[sizeof(turbopath[ti]) + 4], state;
 	FILE *fp;
 
-	if (turbopath[0] == '\0')
+	if (ti == BROKEN)
 		return -1;
 
-	snprintf(cmd, sizeof(cmd), "cat %s", turbopath);
+	snprintf(cmd, sizeof(cmd), "cat %s", turbopath[ti]);
 
 	if (!(fp = popen(cmd, "r")))
 		return -1;
@@ -242,7 +242,7 @@ turbo(int on)
 	if (i != -1 && i == on)
 		return;
 
-	if (!(fp = fopen(turbopath, "w")))
+	if (!(fp = fopen(turbopath[ti], "w")))
 		return;
 
 	/* change state of turbo boost */
@@ -297,12 +297,10 @@ main(int argc, char *argv[])
 	int i;
 
 	/* figure what path to use */
-	if (access(turbos[INTEL], F_OK) != -1)
-		strncpy(turbopath, turbos[INTEL], sizeof turbopath);
-	else if (access(turbos[CPUFREQ], F_OK) != -1)
-		strncpy(turbopath, turbos[CPUFREQ], sizeof turbopath);
-	else
-		strncpy(turbopath, turbos[BROKEN], sizeof turbopath);
+	if (access(turbopath[INTEL], F_OK) != -1)
+		ti = INTEL;
+	else if (access(turbopath[CPUFREQ], F_OK) != -1)
+		ti = CPUFREQ;
 
 	for (i = 1; i < argc; i++)
 		/* these options take no arguments */
@@ -317,9 +315,9 @@ main(int argc, char *argv[])
 				fprintf(stdout, "AC adapter status could not be retrieved.\n");
 			fprintf(stdout, "Average system load: %0.2f\n", avgload());
 			fprintf(stdout, "System temperature: %d °C\n", avgtemp());
-			if (turbopath[0] != '\0') {
+			if (ti != BROKEN) {
 				fprintf(stdout, "Turbo state: %c\n", getturbo());
-				fprintf(stdout, "Turbo path: %s\n", turbopath);
+				fprintf(stdout, "Turbo path: %s\n", turbopath[ti]);
 			} else
 				fprintf(stdout, "CPU turbo boost is not available.\n");
 			exit(0);
