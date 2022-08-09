@@ -1,35 +1,22 @@
 /* See LICENSE file for copyright and license details. */
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <arpa/inet.h>
-
-#include <dirent.h>
-#include <errno.h>
-
 #include <glob.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #include <stdlib.h>
-
-#ifdef __OpenBSD__
+#if defined(__OpenBSD__) || defined(__FreeBSD__)
 #include <sys/param.h>
-#include <sys/sched.h>
 #include <sys/sysctl.h>
 #endif
-
+#ifdef __OpenBSD__
+#include <sys/sched.h>
+#endif
 #ifdef __FreeBSD__
-#include <sys/param.h>
-#include <sys/sysctl.h>
 #include <devstat.h>
 #endif
 
 #include "util.h"
-/* macros */
-#define LENGTH(a)               (sizeof(a) / sizeof(a)[0])
-
 /* enums */
 enum { INTEL, CPUFREQ, BROKEN };
 
@@ -43,7 +30,6 @@ static size_t ti = BROKEN; /* turbo index */
 static unsigned int cpus = 0;
 
 #include "config.h"
-
 
 static float
 avgload(void)
@@ -97,6 +83,8 @@ cpuperc(void)
 	#endif
 }
 
+//TODO remove this. `sacf &`, `setsid -f sacf`, `sacf & disown`, `nohup sacf`,
+//... should do the trick
 static void
 daemonize(void)
 {
