@@ -36,10 +36,11 @@ enum { INTEL, CPUFREQ, BROKEN };
 static const char *turbopath[] = {
 	[INTEL]   = "/sys/devices/system/cpu/intel_pstate/no_turbo",
 	[CPUFREQ] = "/sys/devices/system/cpu/cpufreq/boost",
-	[BROKEN]  = "",
+	[BROKEN]  = "", /* no turbo boost support */
 };
 
 static size_t ti = BROKEN; /* turbo index */
+static unsigned int cpus = 0;
 
 #include "config.h"
 
@@ -189,7 +190,7 @@ setgovernor(const char *governor)
 	FILE *fp;
 	const char path[] = "/sys/devices/system/cpu/cpu";
 	const char end[] = "/cpufreq/scaling_governor";
-	unsigned int i, cpus = nproc();
+	unsigned int i;
 	char tmp[sizeof(path) + sizeof(i) + sizeof(end) + 5];
 
 	for (i = 0; i < cpus; i++) {
@@ -260,7 +261,7 @@ run(void)
 	float threshold;
 
 	/* if energy_performance_preference exist and no intel_pstate, use
-	 * balance governor */
+	 * balance_ governor */
 	if (access(epp, F_OK) != -1 && access(intel, F_OK) == -1) {
 		if (charging)
 			setgovernor("balance_performance");
@@ -278,7 +279,7 @@ run(void)
 		return;
 	}
 
-	threshold = (75 * nproc()) / 100;
+	threshold = (75 * cpus) / 100;
 
 	turbo(cpuperc() >= mincpu
 	|| avgtemp() >= mintemp
@@ -296,11 +297,12 @@ main(int argc, char *argv[])
 {
 	int i;
 
-	/* figure what path to use */
+	/* setup */
 	if (access(turbopath[INTEL], F_OK) != -1)
-		ti = INTEL;
+		ti = INTEL; /* intel driver support */
 	else if (access(turbopath[CPUFREQ], F_OK) != -1)
-		ti = CPUFREQ;
+		ti = CPUFREQ; /* cpufreq driver support */
+	cpus = nproc(); /* store the number of cpus */
 
 	for (i = 1; i < argc; i++)
 		/* these options take no arguments */
@@ -308,7 +310,7 @@ main(int argc, char *argv[])
 			puts("sacf-"VERSION);
 			exit(0);
 		} else if (!strcmp(argv[i], "-l")) { /* info that sacf uses */
-			fprintf(stdout, "Cores: %u\n", nproc());
+			fprintf(stdout, "Cores: %u\n", cpus);
 			fprintf(stdout, "AC adapter status: %d\n", ischarging());
 			fprintf(stdout, "Average system load: %0.2f\n", avgload());
 			fprintf(stdout, "System temperature: %d °C\n", avgtemp());
