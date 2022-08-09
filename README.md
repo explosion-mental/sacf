@@ -24,6 +24,12 @@ Afterwards enter the following command to build and install sacf
     make clean install
 
 
+Credits
+=======
+Thanks to the author of
+[auto-cpufreq](https://github.com/AdnanHodzic/auto-cpufreq) for solving the
+linux + battery problem.
+
 TODO
 ====
 - freebsd and openbsd support
