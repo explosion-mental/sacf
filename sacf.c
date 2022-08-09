@@ -344,7 +344,7 @@ main(int argc, char *argv[])
 
 	while (1) {
 		/* use 1 seconds if the interval is set to 0 */
-		sleep(interval <= 0 ? 1 : interval);
+		sleep(interval);
 		run();
 	}
 
