@@ -188,9 +188,8 @@ setgovernor(const char *governor)
 	FILE *fp;
 	const char path[] = "/sys/devices/system/cpu/cpu";
 	const char end[] = "/cpufreq/scaling_governor";
-	unsigned int i;
+	unsigned int i, cpus = nproc();
 	char tmp[sizeof(path) + sizeof(i) + sizeof(end) + 5];
-	unsigned int cpus = nproc();
 
 	for (i = 0; i < cpus; i++) {
 		/* store the path of cpu i on tmp */
@@ -221,6 +220,7 @@ avgtemp(void)
 
 	/* value in celsius */
 	return temp / 1000;
+
 	#endif /* __linux__ */
 
 	#ifdef __OpenBSD__
@@ -238,8 +238,9 @@ turbo(int on)
 	FILE *fp;
 	int i = getturbo();
 
-	/* do nothing if the turbo state is already as desired */
-	if (i != -1 && i == on)
+	/* do nothing if the turbo state is already as desired or turbo boost
+	 * is not supported */
+	if (i != -1 || i == on)
 		return;
 
 	if (!(fp = fopen(turbopath[ti], "w")))
