@@ -144,18 +144,24 @@ ischarging()
 static unsigned int
 nproc(void)
 {
-	unsigned int threads;
+	unsigned int ret;
+#ifdef _SC_NPROCESSORS_ONLN
+	/* This works on glibc, Mac OS X 10.5, FreeBSD, AIX, OSF/1, Solaris,
+	 * Cygwin, Haiku.  */
+        ret = sysconf(_SC_NPROCESSORS_ONLN);
+#else
+	/* use good old /proc */
 	FILE *fp = fopen("/proc/cpuinfo", "r");
 
 	if (fp == NULL)
 		die("Error opening file '/proc/cpuinfo', fopen failed:");
 
-	while (!fscanf(fp, "siblings\t: %u", &threads))
+	while (!fscanf(fp, "siblings\t: %u", &ret))
 		fscanf(fp, "%*[^s]");
 
 	fclose(fp);
-
-	return threads;
+#endif
+	return ret;
 }
 
 static int
