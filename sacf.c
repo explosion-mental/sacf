@@ -190,8 +190,9 @@ setgovernor(const char *governor)
 	const char end[] = "/cpufreq/scaling_governor";
 	unsigned int i;
 	char tmp[sizeof(path) + sizeof(i) + sizeof(end) + 5];
+	unsigned int cpus = nproc();
 
-	for (i = 0; i < nproc(); i++) {
+	for (i = 0; i < cpus; i++) {
 		/* store the path of cpu i on tmp */
 		snprintf(tmp, sizeof(tmp), "%s%u%s", path, i, end);
 
