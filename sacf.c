@@ -132,7 +132,7 @@ ischarging()
 	glob("/sys/class/power_supply/A*/online", GLOB_NOSORT, NULL, &buf);
 
 	if (!(fp = fopen(buf.gl_pathv[0], "r")))
-		die("Error opening file '%s', fopen failed:", buf.gl_pathv[0]);
+		die("Error reading file '%s', fopen failed:", buf.gl_pathv[0]);
 
 	online = getc(fp) - '0';
 	fclose(fp);
@@ -154,7 +154,7 @@ nproc(void)
 	FILE *fp = fopen("/proc/cpuinfo", "r");
 
 	if (fp == NULL)
-		die("Error opening file '/proc/cpuinfo', fopen failed:");
+		die("Error reading file '/proc/cpuinfo', fopen failed:");
 
 	while (!fscanf(fp, "siblings\t: %u", &ret))
 		fscanf(fp, "%*[^s]");
@@ -170,8 +170,11 @@ getturbo(void)
 	FILE *fp;
 	int state;
 
-	if (ti == BROKEN || !(fp = fopen(turbopath[ti], "r")))
+	if (ti == BROKEN)
 		return -1;
+
+	if (!(fp = fopen(turbopath[ti], "r")))
+		die("Error reading file '%s', fopen failed:", turbopath[ti]);
 
 	/* it's only one character (0 or 1) */
 	state = getc(fp) - '0';
@@ -197,7 +200,7 @@ setgovernor(const char *governor)
 		if ((fp = fopen(tmp, "w")) != NULL)
 			fprintf(fp, "%s\n", governor);
 		else
-			die("Error opening file '%s', fopen failed:", tmp);
+			die("Error writing file '%s', fopen failed:", tmp);
 
 		fclose(fp);
 	}
@@ -240,7 +243,7 @@ turbo(int on)
 		return;
 
 	if (!(fp = fopen(turbopath[ti], "w")))
-		die("Error opening file '%s', fopen failed:", turbopath[ti]);
+		die("Error writing file '%s', fopen failed:", turbopath[ti]);
 
 	/* change state of turbo boost */
 	fprintf(fp, "%d\n", on);
