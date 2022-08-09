@@ -340,8 +340,8 @@ main(int argc, char *argv[])
 			usage();
 
 	while (1) {
-		sleep(interval);
 		run();
+		sleep(interval);
 	}
 
 	return 0;
