@@ -6,6 +6,24 @@
 
 #include "util.h"
 
+void
+die(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	vfprintf(stderr, fmt, ap);
+	va_end(ap);
+
+	if (fmt[0] && fmt[strlen(fmt)-1] == ':') {
+		fputc(' ', stderr);
+		perror(NULL);
+	} else
+		fputc('\n', stderr);
+
+	exit(EXIT_FAILURE);
+}
+
 void *
 ecalloc(size_t nmemb, size_t size)
 {
@@ -16,24 +34,6 @@ ecalloc(size_t nmemb, size_t size)
 	return p;
 }
 
-void
-die(const char *fmt, ...) {
-	va_list ap;
-
-	va_start(ap, fmt);
-	vfprintf(stderr, fmt, ap);
-	va_end(ap);
-
-	if (fmt[0] && fmt[strlen(fmt)-1] == ':') {
-		fputc(' ', stderr);
-		perror(NULL);
-	} else {
-		fputc('\n', stderr);
-	}
-
-	exit(1);
-}
-
 int
 pscanf(const char *path, const char *fmt, ...)
 {
@@ -41,10 +41,9 @@ pscanf(const char *path, const char *fmt, ...)
 	va_list ap;
 	int n;
 
-	if (!(fp = fopen(path, "r"))) {
-		fprintf(stderr, "fopen '%s':", path);
-		return -1;
-	}
+	if (!(fp = fopen(path, "r")))
+		die("fopen '%s':", path);
+
 	va_start(ap, fmt);
 	n = vfscanf(fp, fmt, ap);
 	va_end(ap);
