@@ -122,7 +122,7 @@ daemonize(void)
 	close(STDERR_FILENO);
 }
 
-static char
+static int
 ischarging()
 {	//TODO handle multiple AC online ?
 	FILE *fp;
@@ -138,7 +138,7 @@ ischarging()
 	fclose(fp);
 	globfree(&buf);
 
-	return online;
+	return online - '0';
 }
 
 static unsigned int
@@ -158,7 +158,7 @@ nproc(void)
 	return threads;
 }
 
-static char
+static int
 getturbo(void)
 {
 	FILE *fp;
@@ -171,7 +171,7 @@ getturbo(void)
 	state = getc(fp);
 	fclose(fp);
 
-	return state;
+	return state - '0';
 }
 
 static void
@@ -303,13 +303,13 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-l")) { /* info that sacf uses */
 			fprintf(stdout, "Cores: %u\n", nproc());
 			if (ischarging() != -1)
-				fprintf(stdout, "AC adapter status: %c\n", ischarging());
+				fprintf(stdout, "AC adapter status: %d\n", ischarging());
 			else
 				fprintf(stdout, "AC adapter status could not be retrieved.\n");
 			fprintf(stdout, "Average system load: %0.2f\n", avgload());
 			fprintf(stdout, "System temperature: %d °C\n", avgtemp());
 			if (ti != BROKEN) {
-				fprintf(stdout, "Turbo state: %c\n", getturbo());
+				fprintf(stdout, "Turbo state: %d\n", getturbo());
 				fprintf(stdout, "Turbo path: %s\n", turbopath[ti]);
 			} else
 				fprintf(stdout, "CPU turbo boost is not available.\n");
