@@ -1,40 +1,56 @@
-.TH sacf 1 sacf\-VERSION
-.SH NAME
-sacf \- simple auto cpu frequencer
-.SH SYNOPSIS
-.B sacf
-.RB [ \-blrtTv ]
-.RB [ \-g
-.IR governor ]
-.P
-.SH DESCRIPTION
-.B sacf
-is a simple auto cpu frequencer that only changes two things: the governor and
-turbo boost state; depending on the cpu load, system load and the temperature.
+.TH SACF 1 sacf-VERSION
+.SH "NAME"
+.PP
+sacf - Simple Auto CPU Frequencer
+.SH "SYNOPSIS"
+.PP
+\fBsacf\fP [ \fB-blrtTv\fP ] [ \fB-g\fP \fIgovernor\fP ]
+.SH "DESCRIPTION"
+.PP
+sacf is a simple program that only changes two things: the governor and turbo
+boost state; depending on the cpu load, system load and the temperature.
 Machines that have a battery and most of the time depend on it are the target,
-but since it reduces the power consumption in general it can be beneficial
-anyway, in theory. It needs root access to write to the system filesystem.
-.P
-.SH OPTIONS
-.BR \-b ", " \-\-daemon
+but since it reduces the power consumption in general it can be beneficial, in
+theory.
+
+.PP
+It requires root access to write to the pseudofilesystem \fC/sys\fP in order to change
+the turbo boost value.
+.SH "OPTIONS"
+.PP
+Without any arguments, sacf will run every \fBinterval\fP seconds forever.
+
+.TP
+\fB-d, --daemon\fP
 daemonize process, forks into the background.
 .TP
-.BI \-g " governor"
-sets the governor of all cpus to governor, then exits.
+\fB-g govenor\fP
+run once, then exit.
 .TP
-.B \-l
-prints the system info that sacf uses, then exits.
+\fB-r\fP
+run once, then exit.
 .TP
-.B \-r
-runs once, then exits (doesn't run forever).
+\fB-T\fP
+Disables turbo boost for all cores, then exit.
 .TP
-.B \-t
-enables turbo boost, then exits.
+\fB-t\fP
+Enables turbo boost for all cores, then exit.
 .TP
-.B \-T
-disbles turbo boost, then exits.
-.TP
-.B \-v
-prints version information to stdout, then exits.
-.SH SEE ALSO
-.IR auto-cpufreq (1),
+\fB-v\fP
+Print the version number and exit.
+.SH "CONFIGURATION"
+.PP
+sacf is customized by creating a custom config.h and (re)compiling the source
+code. This keeps it simple, since reading a config file isn’t that hard (but
+adds unneeded complexity), and in many aspects more customizable. I try my best
+to comment about the variables in config.h, since they don’t do anything crazy,
+so it should be very straight foward what does what.
+.SH "ISSUES"
+.PP
+BSD’s system support is not ready.
+.SH "SEE ALSO"
+.PP
+tpl(1)
+.SH "BUGS"
+.PP
+\fIhttps://github.com/explosion-mental/sacf\fP
