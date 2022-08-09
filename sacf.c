@@ -257,6 +257,7 @@ run(void)
 	const char epp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
 	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
 	int bat = ischarging();
+	float threshold;
 
 	/* if energy_performance_preference exist and no intel_pstate, use
 	 * balance governor */
@@ -277,12 +278,11 @@ run(void)
 		return;
 	}
 
-	float load_threshold = (75 * nproc()) / 100;
-	float sysload = avgload();
+	threshold = (75 * nproc()) / 100;
 
 	turbo(cpuperc() >= mincpu
 	|| avgtemp() >= mintemp
-	|| sysload >= load_threshold ? 1 : 0);
+	|| avgload() >= threshold ? 1 : 0);
 }
 
 static void
