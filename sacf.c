@@ -343,7 +343,6 @@ main(int argc, char *argv[])
 			usage();
 
 	while (1) {
-		/* use 1 seconds if the interval is set to 0 */
 		sleep(interval);
 		run();
 	}
