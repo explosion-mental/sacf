@@ -232,7 +232,7 @@ turbo(int on)
 
 	/* do nothing if the turbo state is already as desired or turbo boost
 	 * is not supported */
-	if (i != -1 || i == on)
+	if (i == -1 || i == on)
 		return;
 
 	if (!(fp = fopen(turbopath[ti], "w")))
