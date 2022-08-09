@@ -59,7 +59,7 @@ avgload(void)
 }
 
 
-static int
+static unsigned int
 cpuperc(void)
 {
 	#ifdef __linux__
@@ -71,16 +71,16 @@ cpuperc(void)
 	if (pscanf("/proc/stat", "%*s %Lf %Lf %Lf %Lf %Lf %Lf %Lf",
 	           &a[0], &a[1], &a[2], &a[3], &a[4], &a[5], &a[6])
 	    != 7)
-		return -1;
+		return 0;
 
 	if (b[0] == 0)
-		return -1;
+		return 0;
 
 	sum = (b[0] + b[1] + b[2] + b[3] + b[4] + b[5] + b[6]) -
 	      (a[0] + a[1] + a[2] + a[3] + a[4] + a[5] + a[6]);
 
 	if (sum == 0)
-		return -1;
+		return 0;
 
 	return (int)(100 *
 	               ((b[0] + b[1] + b[2] + b[5] + b[6]) -
@@ -197,21 +197,19 @@ setgovernor(const char *governor)
 	}
 }
 
-static int
+static unsigned int
 avgtemp(void)
 {
 	#ifdef __linux__
-	//uintmax_t temp;
+	//TODO on some systems, there could exist multiple paths, so get an avg
+	//by using glob
+	const char file[] = "/sys/class/thermal/thermal_zone0/temp";
 	unsigned int temp;
-	//TODO on some systems, there could exist multiple path, so get an avg
-	char file[] = "/sys/class/thermal/thermal_zone0/temp";
 
-	if (pscanf(file, "%u", &temp) != 1) {
-		return -1;
-	}
+	if (pscanf(file, "%u", &temp) != 1)
+		return 0;
 
-	/* value in celsius */
-	return temp / 1000;
+	return temp / 1000; /* value in celsius */
 
 	#endif /* __linux__ */
 
