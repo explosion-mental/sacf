@@ -150,7 +150,7 @@ nproc(void)
 	FILE *fp = fopen("/proc/cpuinfo", "r");
 
 	if (fp == NULL)
-		return -1;
+		die("couldn't get cpuinfo, fopen failed:");
 
 	while (!fscanf(fp, "siblings\t: %u", &threads))
 		fscanf(fp, "%*[^s]");
