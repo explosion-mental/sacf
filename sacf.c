@@ -127,18 +127,18 @@ ischarging()
 {	//TODO handle multiple AC online ?
 	FILE *fp;
 	glob_t buf;
-	char online;
+	int online;
 
 	glob("/sys/class/power_supply/A*/online", GLOB_NOSORT, NULL, &buf);
 
 	if (!(fp = fopen(buf.gl_pathv[0], "r")))
 		die("Error opening file '%s', fopen failed:", buf.gl_pathv[0]);
 
-	online = getc(fp);
+	online = getc(fp) - '0';
 	fclose(fp);
 	globfree(&buf);
 
-	return online - '0';
+	return online;
 }
 
 static unsigned int
@@ -174,10 +174,10 @@ getturbo(void)
 		return -1;
 
 	/* it's only one character (0 or 1) */
-	state = getc(fp);
+	state = getc(fp) - '0';
 	fclose(fp);
 
-	return state - '0';
+	return state;
 }
 
 static void
