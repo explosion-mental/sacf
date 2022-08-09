@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include <errno.h>
 
+#include <glob.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -123,22 +124,19 @@ daemonize(void)
 
 static char
 ischarging()
-{
+{	//TODO handle multiple AC online ?
+	FILE *fp;
+	glob_t buf;
 	char online;
-	//TODO handle multiple AC online ?
 
-	//there has to be a better way?
-	FILE *fp = popen("/bin/grep . /sys/class/power_supply/A*/online 2>/dev/null", "r");
-	if (fp == NULL)
-		return -1;
-		//die("Failed to run grep.");
+	glob("/sys/class/power_supply/A*/online", GLOB_NOSORT, NULL, &buf);
 
-	//while (fgets(online, sizeof(online), fp) != NULL) {
-	//online = fgetc(fp);
+	if (!(fp = fopen(buf.gl_pathv[0], "r")))
+		die("fopen '%s' failed:", buf.gl_pathv[0]);
 
-	/* it's only one character (0 or 1) */
 	online = getc(fp);
-	pclose(fp);
+	fclose(fp);
+	globfree(&buf);
 
 	return online;
 }
