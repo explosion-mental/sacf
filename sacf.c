@@ -309,10 +309,7 @@ main(int argc, char *argv[])
 			exit(0);
 		} else if (!strcmp(argv[i], "-l")) { /* info that sacf uses */
 			fprintf(stdout, "Cores: %u\n", nproc());
-			if (ischarging() != -1)
-				fprintf(stdout, "AC adapter status: %d\n", ischarging());
-			else
-				fprintf(stdout, "AC adapter status could not be retrieved.\n");
+			fprintf(stdout, "AC adapter status: %d\n", ischarging());
 			fprintf(stdout, "Average system load: %0.2f\n", avgload());
 			fprintf(stdout, "System temperature: %d °C\n", avgtemp());
 			if (ti != BROKEN) {
