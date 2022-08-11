@@ -139,16 +139,11 @@ nproc(void)
 	 * Cygwin, Haiku.  */
         ret = sysconf(_SC_NPROCESSORS_ONLN);
 #else
-	/* use good old /proc */
-	FILE *fp = fopen("/proc/cpuinfo", "r");
+	glob_t buf;
 
-	if (fp == NULL)
-		die("Error reading file '/proc/cpuinfo', fopen failed:");
-
-	while (!fscanf(fp, "siblings\t: %u", &ret))
-		fscanf(fp, "%*[^s]");
-
-	fclose(fp);
+	glob("/sys/devices/system/cpu/cpu[0-9]*", GLOB_NOSORT, NULL, &buf);
+	ret = buf.gl_pathc;
+	globfree(&buf);
 #endif
 	return ret;
 }
