@@ -1,17 +1,19 @@
 scaf - simple auto cpu frequencer
 =================================
-sacf it's a simple program that monitors the cpu usage, system load and the
-temperature over 5 seconds, by default, and simply tweaks the governors and
-turbo boost only when it needs to.
+sacf it's a simple program that checks the cpu usage, system load and the
+temperature every 15 seconds (by default), and tweak turbo boost if needed.
+
+Depending on the AC state, charging or using the battery, sacf will change the
+[scaling governor](https://wiki.archlinux.org/title/CPU_frequency_scaling#Scaling_governors).
 
 Usage
 -----
-With no arguments sacf will start to run, a successful run will require sudo privileges (permissions to write on /sys/).
+With no arguments sacf will start to run. In order to enable/disable turbo
+boost, sacf will require permissions to write on /sys/.
 
     sacf [-bltTv] [-g governor]
 
-For more  detail information read the man page.
-
+For a more detail information read the man page.
 
 Installation
 ------------
@@ -27,8 +29,8 @@ Afterwards enter the following command to build and install sacf
 Credits
 =======
 Thanks to the author of
-[auto-cpufreq](https://github.com/AdnanHodzic/auto-cpufreq) for solving the
-linux + battery problem.
+[auto-cpufreq](https://github.com/AdnanHodzic/auto-cpufreq) for the solution to
+linux + battery + performance use case.
 
 TODO
 ====
