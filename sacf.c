@@ -39,7 +39,7 @@ avgload(void)
 
 	/* get the average load over 1 minute */
 	if (getloadavg(&avg, 1) < 0) {
-		//printf("getloadavg: Failed to obtain load average");
+		fprintf(stderr, "getloadavg: Failed to obtain load average.\n");
 		return 0.0;
 	}
 
