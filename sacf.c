@@ -17,15 +17,16 @@
 #endif
 
 #include "util.h"
+
 /* enums */
 enum { INTEL, CPUFREQ, BROKEN };
 
+/* globals */
 static const char *turbopath[] = {
 	[INTEL]   = "/sys/devices/system/cpu/intel_pstate/no_turbo",
 	[CPUFREQ] = "/sys/devices/system/cpu/cpufreq/boost",
 	[BROKEN]  = "", /* no turbo boost support */
 };
-
 static size_t ti = BROKEN; /* turbo index */
 static unsigned int cpus = 0;
 
