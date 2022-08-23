@@ -36,9 +36,9 @@ ecalloc(size_t nmemb, size_t size)
 }
 
 void
-eglob(const char *path, glob_t muhglob)
+eglob(const char *path, glob_t *muhglob)
 {
-	switch (glob(path, GLOB_NOSORT, NULL, &muhglob)) {
+	switch (glob(path, GLOB_NOSORT, NULL, muhglob)) {
 	case GLOB_NOSPACE:
 		die("glob failed: running out of memory");
 		break;

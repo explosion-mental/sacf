@@ -118,7 +118,7 @@ ischarging()
 	glob_t buf;
 	int online;
 
-	eglob("/sys/class/power_supply/A*/online", buf);
+	eglob("/sys/class/power_supply/A*/online", &buf);
 
 	if (pscanf(buf.gl_pathv[0], "%d", &online) != 1)
 		return -1;
