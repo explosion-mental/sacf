@@ -238,24 +238,12 @@ turbo(int on)
 static void
 run(void)
 {
-	const char epp[] = "/sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference";
-	const char intel[] = "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost";
-	int charging = ischarging();
 	float threshold;
 
-	/* if energy_performance_preference exist and no intel_pstate, use
-	 * balance_ governor */
-	if (access(epp, F_OK) != -1 && access(intel, F_OK) == -1) {
-		if (charging)
-			setgovernor("balance_performance");
-		else
-			setgovernor("balance_power");
-	} else { /* use default governors */
-		if (charging)
-			setgovernor(acgovernor);
-		else
-			setgovernor(batgovernor);
-	}
+	if (ischarging())
+		setgovernor(acgovernor);
+	else
+		setgovernor(batgovernor);
 
 	if (alwaysturbo) {
 		turbo(1);
