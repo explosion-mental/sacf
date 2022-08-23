@@ -235,6 +235,46 @@ run(void)
 }
 
 static void
+info(void)
+{
+	const char first[]  = "/sys/devices/system/cpu/cpu";
+	const char scgov[]  = "/cpufreq/scaling_governor";
+	const char scfreq[] = "/cpufreq/scaling_cur_freq";
+	const char scdvr[]  = "/cpufreq/scaling_driver";
+	unsigned int i, freq;
+	char path[sizeof(first) + sizeof(i) + sizeof(scgov) + 5];
+	char governor[16], driver[16];
+
+	cpuperc(); /* workaround to make the static variable not 0 */
+	fprintf(stdout, "Cores: %u\n", cpus);
+	fprintf(stdout, "AC adapter status: %d\n", ischarging());
+	fprintf(stdout, "Average system load: %0.2f\n", avgload());
+	fprintf(stdout, "System temperature: %u °C\n", avgtemp());
+	if (ti != BROKEN) {
+		fprintf(stdout, "Turbo state: %d\n", getturbo());
+		fprintf(stdout, "Turbo path: %s\n", turbopath[ti]);
+	} else
+		fprintf(stdout, "CPU turbo boost is not available.\n");
+	fprintf(stdout, "Average CPU usage: %u%%\n", cpuperc());
+
+	/* per cpu info */
+	fprintf(stdout, "Core\tGovernor\tScaling Driver\tFrequency(Khz)\n");
+	for (i = 0; i < cpus; i++) {
+		/* governor */
+		snprintf(path, sizeof(path), "%s%u%s", first, i, scgov);
+		pscanf(path, "%16s", &governor);
+		/* current frequency */
+		snprintf(path, sizeof(path), "%s%u%s", first, i, scfreq);
+		pscanf(path, "%u", &freq);
+		/* driver */
+		snprintf(path, sizeof(path), "%s%u%s", first, i, scdvr);
+		pscanf(path, "%16s", &driver);
+
+		fprintf(stdout, "CPU%d\t%s\t%s\t%u\n", i, governor, driver, freq);
+	}
+}
+
+static void
 usage(void)
 {
 	die("usage: sacf [-blrtTv] [-g governor]");
@@ -258,15 +298,7 @@ main(int argc, char *argv[])
 			puts("sacf-"VERSION);
 			exit(0);
 		} else if (!strcmp(argv[i], "-l")) { /* info that sacf uses */
-			fprintf(stdout, "Cores: %u\n", cpus);
-			fprintf(stdout, "AC adapter status: %d\n", ischarging());
-			fprintf(stdout, "Average system load: %0.2f\n", avgload());
-			fprintf(stdout, "System temperature: %u °C\n", avgtemp());
-			if (ti != BROKEN) {
-				fprintf(stdout, "Turbo state: %d\n", getturbo());
-				fprintf(stdout, "Turbo path: %s\n", turbopath[ti]);
-			} else
-				fprintf(stdout, "CPU turbo boost is not available.\n");
+			info();
 			exit(0);
 		} else if (!strcmp(argv[i], "-t")) { /* turbo on */
 			turbo(1);
