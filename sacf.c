@@ -284,7 +284,7 @@ main(int argc, char *argv[])
 			fprintf(stdout, "Cores: %u\n", cpus);
 			fprintf(stdout, "AC adapter status: %d\n", ischarging());
 			fprintf(stdout, "Average system load: %0.2f\n", avgload());
-			fprintf(stdout, "System temperature: %d °C\n", avgtemp());
+			fprintf(stdout, "System temperature: %u °C\n", avgtemp());
 			if (ti != BROKEN) {
 				fprintf(stdout, "Turbo state: %d\n", getturbo());
 				fprintf(stdout, "Turbo path: %s\n", turbopath[ti]);
