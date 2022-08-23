@@ -31,7 +31,7 @@ clean:
 
 dist: clean
 	mkdir -p sacf-${VERSION}
-	cp -R LICENSE Makefile config.mk config.def.h ${SRC} sacf-${VERSION}
+	cp -R LICENSE Makefile README.md config.mk config.def.h ${SRC} sacf.1 util.h sacf-${VERSION}
 	tar -cf sacf-${VERSION}.tar sacf-${VERSION}
 	gzip sacf-${VERSION}.tar
 	rm -rf sacf-${VERSION}
