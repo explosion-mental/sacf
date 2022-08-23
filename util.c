@@ -1,4 +1,5 @@
 /* See LICENSE file for copyright and license details. */
+#include <glob.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +35,22 @@ ecalloc(size_t nmemb, size_t size)
 	return p;
 }
 
+void
+eglob(const char *path, glob_t muhglob)
+{
+	switch (glob(path, GLOB_NOSORT, NULL, &muhglob)) {
+	case GLOB_NOSPACE:
+		die("glob failed: running out of memory");
+		break;
+	case GLOB_ABORTED:
+		die("glob failed: read error");
+		break;
+	case GLOB_NOMATCH:
+		fprintf(stderr, "glob: no matches\n");
+		break;
+	}
+}
+
 int
 pscanf(const char *path, const char *fmt, ...)
 {
@@ -51,4 +68,3 @@ pscanf(const char *path, const char *fmt, ...)
 
 	return (n == EOF) ? -1 : n;
 }
-

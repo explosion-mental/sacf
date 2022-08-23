@@ -6,4 +6,5 @@
 
 void die(const char *fmt, ...);
 void *ecalloc(size_t nmemb, size_t size);
+void eglob(const char *path, glob_t muhglob);
 int pscanf(const char *path, const char *fmt, ...);
