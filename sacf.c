@@ -115,19 +115,15 @@ daemonize(void)
 static int
 ischarging()
 {	//TODO handle multiple AC online ?
-	FILE *fp;
 	glob_t buf;
 	int online;
 
 	eglob("/sys/class/power_supply/A*/online", buf);
 
-	if (!(fp = fopen(buf.gl_pathv[0], "r")))
-		die("Error reading file '%s', fopen failed:", buf.gl_pathv[0]);
+	if (pscanf(buf.gl_pathv[0], "%d", &online) != 1)
+		return -1;
 
-	online = getc(fp) - '0';
-	fclose(fp);
 	globfree(&buf);
-
 	return online;
 }
 
@@ -152,18 +148,13 @@ nproc(void)
 static int
 getturbo(void)
 {
-	FILE *fp;
 	int state;
 
 	if (ti == BROKEN)
 		return -1;
 
-	if (!(fp = fopen(turbopath[ti], "r")))
-		die("Error reading file '%s', fopen failed:", turbopath[ti]);
-
-	/* it's only one character (0 or 1) */
-	state = getc(fp) - '0';
-	fclose(fp);
+	if (pscanf(turbopath[ti], "%d", &state) != 1)
+		return 0;
 
 	return state;
 }
