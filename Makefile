@@ -10,6 +10,7 @@ all: options sacf
 
 options:
 	@echo sacf build options:
+	@echo "VERSION  = ${VERSION}"
 	@echo "CFLAGS   = ${CFLAGS}"
 	@echo "LDFLAGS  = ${LDFLAGS}"
 	@echo "CC       = ${CC}"
