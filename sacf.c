@@ -119,7 +119,7 @@ ischarging()
 	glob_t buf;
 	int online;
 
-	glob("/sys/class/power_supply/A*/online", GLOB_NOSORT, NULL, &buf);
+	eglob("/sys/class/power_supply/A*/online", buf);
 
 	if (!(fp = fopen(buf.gl_pathv[0], "r")))
 		die("Error reading file '%s', fopen failed:", buf.gl_pathv[0]);
@@ -142,7 +142,7 @@ nproc(void)
 #else
 	glob_t buf;
 
-	glob("/sys/devices/system/cpu/cpu[0-9]*", GLOB_NOSORT, NULL, &buf);
+	eglob("/sys/devices/system/cpu/cpu[0-9]*", &buf);
 	ret = buf.gl_pathc;
 	globfree(&buf);
 #endif
