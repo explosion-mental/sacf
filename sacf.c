@@ -150,11 +150,11 @@ getturbo(void)
 {
 	int state;
 
-	if (ti == BROKEN)
+	if (ti == BROKEN) /* no turbo boost support */
 		return -1;
 
 	if (pscanf(turbopath[ti], "%d", &state) != 1)
-		return 0;
+		return -1;
 
 	return state;
 }
@@ -162,7 +162,6 @@ getturbo(void)
 static void
 setgovernor(const char *governor)
 {
-	FILE *fp;
 	const char path[] = "/sys/devices/system/cpu/cpu";
 	const char end[] = "/cpufreq/scaling_governor";
 	unsigned int i;
@@ -171,14 +170,7 @@ setgovernor(const char *governor)
 	for (i = 0; i < cpus; i++) {
 		/* store the path of cpu i on tmp */
 		snprintf(tmp, sizeof(tmp), "%s%u%s", path, i, end);
-
-		/* set the governor of cpu i */
-		if ((fp = fopen(tmp, "w")) != NULL)
-			fprintf(fp, "%s\n", governor);
-		else
-			die("Error writing file '%s', fopen failed:", tmp);
-
-		fclose(fp);
+		pprintf(tmp, "%s\n", governor);
 	}
 }
 
@@ -210,21 +202,14 @@ avgtemp(void)
 static void
 turbo(int on)
 {
-	FILE *fp;
 	int i = getturbo();
 
 	/* do nothing if the turbo state is already as desired or turbo boost
 	 * is not supported */
 	if (i == -1 || i == on)
 		return;
-
-	if (!(fp = fopen(turbopath[ti], "w")))
-		die("Error writing file '%s', fopen failed:", turbopath[ti]);
-
 	/* change state of turbo boost */
-	fprintf(fp, "%d\n", on);
-
-	fclose(fp);
+	pprintf(turbopath[ti], "%d\n", on);
 }
 
 static void

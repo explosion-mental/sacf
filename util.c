@@ -68,3 +68,21 @@ pscanf(const char *path, const char *fmt, ...)
 
 	return (n == EOF) ? -1 : n;
 }
+
+int
+pprintf(const char *path, const char *fmt, ...)
+{
+	FILE *fp;
+	va_list ap;
+	int n;
+
+	if (!(fp = fopen(path, "w")))
+		die("fopen '%s':", path);
+
+	va_start(ap, fmt);
+	n = vfprintf(fp, fmt, ap);
+	va_end(ap);
+	fclose(fp);
+
+	return (n == EOF) ? -1 : n;
+}
