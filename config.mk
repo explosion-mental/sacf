@@ -2,7 +2,7 @@
 VERSION = 1.5
 
 # sacf git exact commit version
-SRCVERSION = $$(git describe --tags --dirty=[modified])
+SRCVERSION = $$(git describe --tags --dirty=[modified] 2>/dev/null || echo ${VERSION})
 
 # Customize below to fit your system
 
