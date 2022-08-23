@@ -84,5 +84,5 @@ pprintf(const char *path, const char *fmt, ...)
 	va_end(ap);
 	fclose(fp);
 
-	return (n == EOF) ? -1 : n;
+	return (n < 0) ? -1 : n;
 }
