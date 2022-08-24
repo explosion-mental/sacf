@@ -6,6 +6,43 @@ include config.mk
 SRC = sacf.c util.c
 OBJ = ${SRC:.c=.o}
 
+# detect if the user chose GCC or Clang
+ifeq ($(CC),gcc)
+
+	CC  	= gcc
+        CFLAGS += -Wextra -flto
+	LINKER 	= gcc
+
+ifeq ($(DEBUG),true)
+	# gcc-specific security/debug flags
+	CFLAGS += -fanalyzer -ggdb
+
+endif #debug
+
+else ifeq ($(CC),clang)
+
+	CC  	= clang
+	CFLAGS += -Weverything -flto
+	LINKER 	= clang
+
+ifeq ($(DEBUG),true)
+	# clang-specific security/debug flags
+        CFLAGS += -fsanitize=undefined,signed-integer-overflow,null,alignment,address,leak,cfi \
+	-fsanitize-undefined-trap-on-error -ftrivial-auto-var-init=pattern \
+	-fvisibility=hidden  
+	
+	LDFLAGS  += -fsanitize=address
+endif #debug
+
+endif #compiler
+ifeq ($(DEBUG),true)
+        CFLAGS +=        -fno-omit-frame-pointer -fstack-clash-protection -D_FORTIFY_SOURCE=2 \
+			  -fcf-protection -fstack-protector-all -fexceptions -fasynchronous-unwind-tables \
+			  -Werror=format-security -D_DEBUG -fno-builtin-malloc -fno-builtin-calloc -fno-builtin
+	LDFLAGS += -flto -fPIE -pie -Wl,-z,relro -Wl,--as-needed -Wl,-z,now \
+			  -Wl,-z,noexecstack
+endif
+
 all: options sacf
 
 options:
