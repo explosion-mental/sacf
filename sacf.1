@@ -1,3 +1,4 @@
+.TH "" "1" 
 .TH SACF 1 sacf-VERSION
 .SH "NAME"
 .PP
@@ -7,37 +8,49 @@ sacf - Simple Auto CPU Frequencer
 \fBsacf\fP [ \fB-blrtTv\fP ] [ \fB-g\fP \fIgovernor\fP ]
 .SH "DESCRIPTION"
 .PP
-sacf is a simple program that only changes two things: the governor and turbo
-boost state; depending on the cpu load, system load and the temperature.
+\fBsacf\fP is a simple program that only changes two things: the \fBgovernor\fP and \fBturbo
+boost\fP state; depending on the cpu load, system load and the temperature. 
+.br
 Machines that have a battery and most of the time depend on it are the target,
 but since it reduces the power consumption in general it can be beneficial, in
-theory.
+theory. 
+.br
 
 .PP
-It requires root access to write to the pseudofilesystem \fC/sys\fP in order to change
-the turbo boost value.
+It requires root access in order to write to the pseudofilesystem \fC/sys\fP to change
+the turbo boost and the kernel governor.
 .SH "OPTIONS"
 .PP
 Without any arguments, sacf will run every \fBinterval\fP seconds forever.
 
 .TP
-\fB-d, --daemon\fP
-daemonize process, forks into the background.
+\fB-b, --daemon\fP
+Daemonize process, forks into the background.
 .TP
-\fB-g govenor\fP
-run once, then exit.
+\fB-g, --governor governor\fP
+Sets \fBgovernor\fP to all cpus, then exit.
 .TP
-\fB-r\fP
-run once, then exit.
+\fB-l, --list\fP
+Print stats about the system, then exit (can be run without root).
 .TP
-\fB-T\fP
-Disables turbo boost for all cores, then exit.
+\fB-r, --run-once\fP
+Run once, then exit.
 .TP
-\fB-t\fP
-Enables turbo boost for all cores, then exit.
+\fB-t, --enable-turbo\fP
+Enables turbo boost for all cpus, then exit.
 .TP
-\fB-v\fP
+\fB-T, --disable-turbo\fP
+Disables turbo boost for all cpus, then exit.
+.TP
+\fB-v, --version\fP
 Print the version number and exit.
+.SH "NOTES"
+.PP
+Some general tips about battery:
+.IP \(dg 4
+Using turbo boost will, most likely, fire up the fans on your machine, at least lightly in a constant use of it.
+.IP \(dg 4
+Overheating usually appears in machines that handle a big workload (usage), are using AC and have their CPUs running at the max. Using \fCsacf\fP, you could avoid this by setting the \fBacturbo\fP to \fBNever\fP, and setting the \fBacgovernor\fP to \fBpowersave\fP or the similar.
 .SH "CONFIGURATION"
 .PP
 sacf is customized by creating a custom config.h and (re)compiling the source
@@ -47,7 +60,7 @@ to comment about the variables in config.h, since they don’t do anything crazy
 so it should be very straight foward what does what.
 .SH "ISSUES"
 .PP
-BSD’s system support is not ready.
+BSD’s systems support is not ready.
 .SH "SEE ALSO"
 .PP
 tpl(1)
