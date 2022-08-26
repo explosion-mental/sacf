@@ -269,13 +269,13 @@ info(void)
 	for (i = 0; i < cpus; i++) {
 		/* governor */
 		snprintf(path, sizeof(path), "%s%u%s", first, i, scgov);
-		pscanf(path, "%16s", &governor);
+		pscanf(path, "%16s", governor);
 		/* current frequency */
 		snprintf(path, sizeof(path), "%s%u%s", first, i, scfreq);
 		pscanf(path, "%u", &freq);
 		/* driver */
 		snprintf(path, sizeof(path), "%s%u%s", first, i, scdvr);
-		pscanf(path, "%16s", &driver);
+		pscanf(path, "%16s", driver);
 
 		fprintf(stdout, "CPU%d\t%s\t%s\t%u\n", i, governor, driver, freq);
 	}
