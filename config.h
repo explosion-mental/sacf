@@ -1,13 +1,16 @@
 /* See LICENSE file for copyright and license details. */
-static const unsigned int interval = 15;  /* seconds to wait before running */
+
+/* seconds to sleep(3) before adjusting the system */
+static const unsigned int interval = 15;
+
 /* Usual avaliable governors:
  * 	performance - powersave - userspace - ondemand - conservative - schedutil
  * Check supported govenors:
  * 	cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
  *
- * NOTE FOR INTEL USERS: (modern) intel CPUs have additional governors which
- * are preferable over the cpufreq's ones. These 'intel specific' suggested
- * governors are: "balance_performance" and "balance_power".
+ * NOTE FOR INTEL USERS: (modern) intel CPUs have a pstate, which is preferable
+ * over the cpufreq. As a suggestion, these 'intel specific' governors are:
+ * 	balance_performance - balance_power
  * Check if the path /sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost exist */
 
 /* default governor to use when using the battery */
