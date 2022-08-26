@@ -17,6 +17,10 @@ theory.
 .br
 
 .PP
+Currently, supported platform is linux (no BSD’s).
+.br
+
+.PP
 It requires root access in order to write to the pseudofilesystem \fC/sys\fP to change
 the turbo boost and the kernel governor.
 .SH "OPTIONS"
@@ -58,9 +62,6 @@ code. This keeps it simple, since reading a config file isn’t that hard (but
 adds unneeded complexity), and in many aspects more customizable. I try my best
 to comment about the variables in config.h, since they don’t do anything crazy,
 so it should be very straight foward what does what.
-.SH "ISSUES"
-.PP
-BSD’s systems support is not ready.
 .SH "SEE ALSO"
 .PP
 tpl(1)
