@@ -221,20 +221,18 @@ run(void)
 		setgovernor(acgovernor);
 		if (acturbo == Never)
 			turbo(0);
-		else if (acturbo == Always)
-			turbo(1);
-		else /* Auto */
-			turbo(cpuperc() >= mincpu
+		else
+			turbo(acturbo == Always
+			|| cpuperc() >= mincpu
 			|| avgtemp() >= mintemp
 			|| avgload() >= threshold);
 	} else {
 		setgovernor(batgovernor);
 		if (batturbo == Never)
 			turbo(0);
-		else if (batturbo == Always)
-			turbo(1);
-		else /* Auto */
-			turbo(cpuperc() >= mincpu
+		else
+			turbo(batturbo == Always
+			|| cpuperc() >= mincpu
 			|| avgtemp() >= mintemp
 			|| avgload() >= threshold);
 	}
