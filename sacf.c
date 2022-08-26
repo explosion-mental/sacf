@@ -217,21 +217,28 @@ run(void)
 {
 	float threshold = (75 * cpus) / 100;
 
-	if (ischarging())
+	if (ischarging()) {
 		setgovernor(acgovernor);
-	else
+		if (acturbo == Never)
+			turbo(0);
+		else if (acturbo == Always)
+			turbo(1);
+		else /* Auto */
+			turbo(cpuperc() >= mincpu
+			|| avgtemp() >= mintemp
+			|| avgload() >= threshold);
+	} else {
 		setgovernor(batgovernor);
+		if (batturbo == Never)
+			turbo(0);
+		else if (batturbo == Always)
+			turbo(1);
+		else /* Auto */
+			turbo(cpuperc() >= mincpu
+			|| avgtemp() >= mintemp
+			|| avgload() >= threshold);
+	}
 
-	if (turboboost == Never) {
-		turbo(0);
-		return;
-	} else if (turboboost == Always) {
-		turbo(1);
-		return;
-	} else /* Auto */
-		turbo(cpuperc() >= mincpu
-		|| avgtemp() >= mintemp
-		|| avgload() >= threshold);
 }
 
 static void
