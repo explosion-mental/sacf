@@ -214,23 +214,17 @@ turbo(int on)
 static void
 run(void)
 {
-	float threshold;
+	float threshold = (75 * cpus) / 100;
 
 	if (ischarging())
 		setgovernor(acgovernor);
 	else
 		setgovernor(batgovernor);
 
-	if (alwaysturbo) {
-		turbo(1);
-		return;
-	}
-
-	threshold = (75 * cpus) / 100;
-
-	turbo(cpuperc() >= mincpu
+	turbo(alwaysturbo
+	|| cpuperc() >= mincpu
 	|| avgtemp() >= mintemp
-	|| avgload() >= threshold ? 1 : 0);
+	|| avgload() >= threshold);
 }
 
 static void
