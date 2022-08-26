@@ -18,3 +18,7 @@ static const char batgovernor[] = "powersave";
 
 /* default governor to use when AC adapter is connected */
 static const char acgovernor[]  = "performance";
+
+/* Path to the sensors, in order to fetch the overall temperature.
+ * Usually at /sys/class/thermal/ */
+static const char thermal[] = "/sys/class/thermal/thermal_zone0/temp";

@@ -180,10 +180,9 @@ avgtemp(void)
 	#ifdef __linux__
 	//TODO on some systems, there could exist multiple paths, so get an avg
 	//by using glob
-	const char file[] = "/sys/class/thermal/thermal_zone0/temp";
 	unsigned int temp;
 
-	if (pscanf(file, "%u", &temp) != 1)
+	if (pscanf(thermal, "%u", &temp) != 1)
 		return 0;
 
 	return temp / 1000; /* value in celsius */
