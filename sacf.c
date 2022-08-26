@@ -287,28 +287,34 @@ main(int argc, char *argv[])
 
 	for (i = 1; i < argc; i++)
 		/* these options take no arguments */
-		if (!strcmp(argv[i], "-v")) {      /* prints version information */
+		if (!strcmp(argv[i], "-v") /* prints version information */
+		|| !strcmp(argv[i], "--version")) {
 			puts("sacf-"VERSION);
 			exit(0);
-		} else if (!strcmp(argv[i], "-l")) { /* info that sacf uses */
+		} else if (!strcmp(argv[i], "-l") /* stats about the system */
+			|| !strcmp(argv[i], "--list")) {
 			info();
 			exit(0);
-		} else if (!strcmp(argv[i], "-t")) { /* turbo on */
+		} else if (!strcmp(argv[i], "-t") /* turbo on */
+			|| !strcmp(argv[i], "--enable-turbo")) {
 			turbo(1);
 			exit(0);
-		} else if (!strcmp(argv[i], "-T")) { /* turbo off */
+		} else if (!strcmp(argv[i], "-T") /* turbo off */
+			|| !strcmp(argv[i], "--disable-turbo")) {
 			turbo(0);
 			exit(0);
-		} else if (!strcmp(argv[i], "-r")) { /* run once */
+		} else if (!strcmp(argv[i], "-r") /* run once */
+			|| !strcmp(argv[i], "--run-once")) {
 			run();
 			exit(0);
 		} else if (!strcmp(argv[i], "-b")
 			|| !strcmp(argv[i], "--daemon")) { /* daemon mode */
 			daemonize();
-		} else if (i + 1 == argc)
+		} else if (i + 1 == argc) {
 			usage();
 		/* these options take one argument */
-		else if (!strcmp(argv[i], "-g")) { /* set governor */
+		} else if (!strcmp(argv[i], "-g") /* set governor */
+			|| !strcmp(argv[i], "--governor")) {
 			setgovernor(argv[++i]);
 			exit(0);
 		} else
