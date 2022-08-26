@@ -20,6 +20,7 @@
 
 /* enums */
 enum { INTEL, CPUFREQ, BROKEN };
+enum { Always, Never, Auto };
 
 /* globals */
 static const char *turbopath[] = {
@@ -221,10 +222,16 @@ run(void)
 	else
 		setgovernor(batgovernor);
 
-	turbo(alwaysturbo
-	|| cpuperc() >= mincpu
-	|| avgtemp() >= mintemp
-	|| avgload() >= threshold);
+	if (turboboost == Never) {
+		turbo(0);
+		return;
+	} else if (turboboost == Always) {
+		turbo(1);
+		return;
+	} else /* Auto */
+		turbo(cpuperc() >= mincpu
+		|| avgtemp() >= mintemp
+		|| avgload() >= threshold);
 }
 
 static void

@@ -2,7 +2,12 @@
 static const unsigned int mincpu      = 20;   /* percentage of cpu usage where turbo boost is enabled */
 static const unsigned int mintemp     = 70;   /* degrees celsius where turbo boost is enabled */
 static const unsigned int interval    = 15;   /* seconds to wait before running */
-static const unsigned int alwaysturbo = 0;    /* 1 means never disables turbo boost */
+
+/* Always: turbo boost will always be on.
+ * Never:  turbo boost will never be on.
+ * Auto:   depending on the cpu usage, system load and temperature, turbo boost
+ *         will be on/off. */
+static const unsigned int turboboost  = Auto;
 
 /* (usual) governors:
  * 	performance - powersave - userspace - ondemand - conservative - schedutil
