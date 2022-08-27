@@ -30,5 +30,6 @@ static const unsigned int acturbo  = Auto; /* value to use in AC */
 static const unsigned int mincpu  = 20;    /* percentage of cpu usage where turbo boost is enabled */
 static const unsigned int mintemp = 70;    /* degrees celsius where turbo boost is enabled */
 /* Path to the sensors, in order to fetch the overall temperature.
- * Usually at /sys/class/thermal/ */
+ * Usually at /sys/class/thermal/thermal_zone0/temp or
+ * /sys/class/hwmon/hwmon0/device/temp1_input */
 static const char thermal[] = "/sys/class/thermal/thermal_zone0/temp";
