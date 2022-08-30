@@ -46,7 +46,7 @@ eglob(const char *path, glob_t *muhglob)
 		die("glob failed: read error");
 		break;
 	case GLOB_NOMATCH:
-		fprintf(stderr, "glob: no matches\n");
+		die("glob failed: no matches.");
 		break;
 	}
 }
