@@ -263,7 +263,7 @@ info(void)
 	fprintf(stdout, "Average CPU usage: %u%%\n", cpuperc());
 
 	/* per cpu info */
-	fprintf(stdout, "Core\tGovernor\tScaling Driver\tFrequency(Khz)\n");
+	fprintf(stdout, "Core\tGovernor\tScaling Driver\tFrequency(kHz)\n");
 	for (i = 0; i < cpus; i++) {
 		/* governor */
 		snprintf(path, sizeof(path), "%s%u%s", first, i, scgov);
