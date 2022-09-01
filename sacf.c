@@ -216,26 +216,15 @@ static void
 run(void)
 {
 	float threshold = (75 * cpus) / 100;
+	int charge = ischarging();
+	unsigned int tb = charge ? acturbo : batturbo;
 
-	if (ischarging()) {
-		setgovernor(acgovernor);
-		if (acturbo == Never)
-			turbo(0);
-		else
-			turbo(acturbo == Always
-			|| cpuperc() >= mincpu
-			|| avgtemp() >= mintemp
-			|| avgload() >= threshold);
-	} else {
-		setgovernor(batgovernor);
-		if (batturbo == Never)
-			turbo(0);
-		else
-			turbo(batturbo == Always
-			|| cpuperc() >= mincpu
-			|| avgtemp() >= mintemp
-			|| avgload() >= threshold);
-	}
+	setgovernor(charge ? acgovernor : batgovernor);
+	turbo(tb != Never
+	&& (tb == Always
+	|| cpuperc() >= mincpu
+	|| avgtemp() >= mintemp
+	|| avgload() >= threshold));
 
 }
 
