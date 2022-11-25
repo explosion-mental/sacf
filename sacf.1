@@ -16,6 +16,13 @@ theory.
 .br
 
 .PP
+\fBsacf\fP will run only if \fI/var/run/sacf.lock\fP doesn’t exist, created when run. This
+is to avoid multiple instances of \fBsacf\fP run at the same time.
+.br
+The lock is \fBignored\fP if any cli option is used but \fI\-b\fP or \fI\-\-daemon\fP is used.
+.br
+
+.PP
 Currently, supported platform is linux (no BSD’s).
 .br
 
