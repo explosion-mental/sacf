@@ -8,6 +8,10 @@ Depending on the AC state, charging or using the battery, sacf will change the
 
 Usage
 -----
+**sacf** will run only if `/var/run/sacf.lock` doesn't exist, created when run. This
+is to avoid multiple instances of **sacf** run at the same time.
+The lock is **ignored** if any cli option is used but `-b` or `--daemon` is used.
+
 With no arguments sacf will start to run. In order to enable/disable turbo
 boost, sacf will require permissions to write on /sys/.
 
