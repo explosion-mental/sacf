@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
 #if defined(__OpenBSD__) || defined(__FreeBSD__)
 #include <sys/param.h>
 #include <sys/sysctl.h>
@@ -17,6 +18,9 @@
 #endif
 
 #include "util.h"
+
+/* DONT CHANGE */
+#define LOCK	"/var/run/sacf.lock"
 
 /* enums */
 enum { INTEL, CPUFREQ, BROKEN };
@@ -57,6 +61,7 @@ cpuperc(void)
 
 	memcpy(b, a, sizeof(b));
 	/* cpu user nice system idle iowait irq softirq */
+	/*       0     1      2    3      4   5       6 */
 	if (pscanf("/proc/stat", "%*s %Lf %Lf %Lf %Lf %Lf %Lf %Lf",
 	           &a[0], &a[1], &a[2], &a[3], &a[4], &a[5], &a[6])
 	    != 7)
@@ -274,6 +279,13 @@ usage(void)
 	die("usage: sacf [-blrtTv] [-g governor]");
 }
 
+static void
+cleanup(int unused)
+{
+	remove(LOCK); //unlink(2) it's async-signal-safe
+	_exit(EXIT_SUCCESS);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -321,10 +333,21 @@ main(int argc, char *argv[])
 		} else
 			usage();
 
+	signal(SIGINT, cleanup);
+	signal(SIGTERM, cleanup);
+
+	/* hardcoded lock file */
+	if (access(LOCK, F_OK) != -1)
+		die("-> " LOCK " is present.\n-> There may be another instance of sacf already running.");
+	else
+		pprintf(LOCK, "%d", getpid());
+
 	while (1) {
 		run();
 		sleep(interval);
 	}
 
-	return 0;
+	remove(LOCK);
+
+	return EXIT_SUCCESS;
 }
