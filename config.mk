@@ -1,5 +1,5 @@
 # sacf version
-VERSION = 1.6
+VERSION = 1.7
 
 # sacf git exact commit version
 SRCVERSION = $$(git describe --tags --dirty=[modified] 2>/dev/null || echo ${VERSION}-nogit)
